@@ -67,6 +67,8 @@ export class ListItemsComponent implements OnInit, OnDestroy {
     
     this.userDataService.getUserData().subscribe(data => {
       this.userData = data;
+      console.log("dadosaki", data);
+      
       this.userId = data?.userId
       
       if (this.userId) {
