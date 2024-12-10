@@ -34,7 +34,6 @@ export class AddItemsComponent {
     category: ['', Validators.required]
   });
 
-
    formatPrice(): void {
     const priceControl = this.addItemForm.get('price');
     let value = priceControl?.value?.toString().replace(/\D/g, '');
@@ -51,47 +50,45 @@ export class AddItemsComponent {
 
   async addItem(): Promise<void> {
     try {
-      const userId = await firstValueFrom(this.userDataService.getUserId());
-      const numericUserId = userId ? userId.split('|')[1]: '';
-
-      if(!userId) {
-        throw new Error('User id is Undefined')
-      }
-
-      const formValue = { ...this.addItemForm.value } as unknown as Iproduct;
-      formValue.price = this.convertFormattedPriceToNumber(formValue.price.toString()).toFixed(2)
-
-      // console.log("price-add", formValue.price);
+      console.log('nois');
       
-
+      const userId = await firstValueFrom(this.userDataService.getUserId());
+      const numericUserId = userId ? userId.split('|')[1] : '';
+  
+      if (!numericUserId) {
+        throw new Error('User ID is undefined.');
+      }
+  
+      const formValue = { ...this.addItemForm.value } as unknown as Iproduct;
+      formValue.price = this.convertFormattedPriceToNumber(formValue.price.toString()).toFixed(2);
+  
       const newItem: Iproduct = {
         ...formValue,
-       userId: numericUserId, 
+        userId: numericUserId,
       };
-      
+  
       const newCategory = newItem.category?.toLowerCase();
-
-
+      console.log('nois3');
+  
       if (this.editing && this.currentItemId !== null) {
         if (newCategory !== this.currentItemCategory) {
-          
-          this.productService.deleteItem(this.currentItemCategory!, this.currentItemId).subscribe(() => {
-            this.productService.addItem(newCategory!, newItem).subscribe(() => {
-              this.notifyEditItem.emit();
-              this.itemUpdated.emit();
-            });
-          });
+          // Remove o item da categoria antiga e adiciona à nova
+          await this.productService.deleteItem(numericUserId, this.currentItemCategory!, this.currentItemId);
+          await this.productService.addItem(numericUserId, newCategory!, newItem);
+          console.log('noiscat');
         } else {
-          this.productService.updateItem(this.currentItemCategory, this.currentItemId, newItem).subscribe(() => {
-            this.notifyEditItem.emit();
-            this.itemUpdated.emit();
-          });
+          // Atualiza o item na mesma categoria
+          await this.productService.updateItem(numericUserId, this.currentItemCategory!, this.currentItemId, newItem);
         }
+        this.notifyEditItem.emit();
+        this.itemUpdated.emit();
       } else if (newCategory) {
-        this.productService.addItem(newCategory, newItem).subscribe(() => {
-          this.notifyAddItem.emit();
-          this.itemUpdated.emit();
-        });
+        // Adiciona um novo item
+        console.log('noistt');
+        await this.productService.addItem(numericUserId, newCategory, newItem);
+
+        this.notifyAddItem.emit();
+        this.itemUpdated.emit();
       }
   
       this.addItemForm.reset();
@@ -99,9 +96,10 @@ export class AddItemsComponent {
       this.currentItemId = null;
       this.currentItemCategory = null;
     } catch (error) {
-      console.error('Erro ao obter o id do usuário',error);
+      console.log('nada é');
+      
+      console.error('Erro ao adicionar item:', error);
     }
-
   }
 
   convertFormattedPriceToNumber(formattedPrice: string): number {
