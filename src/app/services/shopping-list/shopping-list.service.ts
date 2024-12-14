@@ -1,15 +1,17 @@
 import { Injectable } from '@angular/core';
+import { Iproduct } from '../../interfaces/item-list';
+import { Firestore, doc, collection, setDoc, updateDoc, getDoc, arrayUnion, arrayRemove } from '@angular/fire/firestore';
+
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
-import { Iproduct } from '../../interfaces/item-list';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ShoppingListService {
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, private firestore: Firestore) { }
   
   private apiUrl = 'http://localhost:3000';
 
@@ -34,69 +36,84 @@ export class ShoppingListService {
     return throwError(() => new Error(errorMessage))
   }
 
-  getItemsByCategory(category: string, userId: string): Observable<Iproduct[]> {
-    return this.http.get<Iproduct[]>(`${this.apiUrl}/${category}?userId=${userId}`)
-    .pipe(
-      catchError(this.handleError)
-    );    
-  }
 
-  addItem(category: string, item: Iproduct): Observable<Iproduct> {
+  async addItem(userId: string, category: string, item: Iproduct): Promise<void> {
     
-    return this.http.post<Iproduct>(`${this.apiUrl}/${category}`, item)
-    .pipe(
-      catchError(this.handleError)
-    );
+    const userRef = doc(this.firestore, `users/${userId}`);
+    const userDoc = await getDoc(userRef);
+
+    if (userDoc.exists()) {
+      const userData = userDoc.data();
+      const updatedShoppingLists = userData['shoppingLists']?.map((list: any) => {
+        if (list.category === category) {
+          console.log('dados run');
+          
+          return { ...list, products: [...list.products, item] };
+        }
+        return list;
+      });
+
+      await updateDoc(userRef, { shoppingLists: updatedShoppingLists });
+    } else {
+      throw new Error('Usuário não encontrado.');
+    }
   }
 
-  updateItem(category: string, itemId: string, item: Iproduct): Observable<Iproduct> {
-    return this.http.put<Iproduct>(`${this.apiUrl}/${category}/${itemId}`, item)
-    .pipe(
-      catchError(this.handleError)
-    );
+  async updateItem(userId: string, category: string, itemId: string, updatedItem: Iproduct): Promise<void> {
+    const userRef = doc(this.firestore, `users/${userId}`);
+    const userDoc = await getDoc(userRef);
+
+    if (userDoc.exists()) {
+      const userData = userDoc.data();
+      const updatedShoppingLists = userData['shoppingLists']?.map((list: any) => {
+        if (list.category === category) {
+          const updatedProducts = list.products.map((product: any) =>
+            product.id === itemId ? updatedItem : product
+          );
+          return { ...list, products: updatedProducts };
+        }
+        return list;
+      });
+
+      await updateDoc(userRef, { shoppingLists: updatedShoppingLists });
+    } else {
+      throw new Error('Usuário não encontrado.');
+    }
   }
 
-  deleteItem(category: string, itemId: string): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${category}/${itemId}`)
-    .pipe(
-      catchError(this.handleError)
-    );
+  // Remove um item de uma categoria
+  async deleteItem(userId: string, category: string, itemId: string): Promise<void> {
+    const userRef = doc(this.firestore, `users/${userId}`);
+    const userDoc = await getDoc(userRef);
+
+    if (userDoc.exists()) {
+      const userData = userDoc.data();
+      const updatedShoppingLists = userData['shoppingLists']?.map((list: any) => {
+        if (list.category === category) {
+          const updatedProducts = list.products.filter((product: any) => product.id !== itemId);
+          return { ...list, products: updatedProducts };
+        }
+        return list;
+      });
+
+      await updateDoc(userRef, { shoppingLists: updatedShoppingLists });
+    } else {
+      throw new Error('Usuário não encontrado.');
+    }
   }
 
-  // services Buy
-
-  getPurchasedItems(category: string): Observable<Iproduct[]> {
-    const categoryBuyEndpoint = `${category}-Buy`;
-    return this.http.get<Iproduct[]>(`${this.apiUrl}/${categoryBuyEndpoint}`)
-    .pipe(
-      catchError(this.handleError)
-    );
+  async getItemsByCategory(userId: string, category: string): Promise<Iproduct[]> {
+    const userRef = doc(this.firestore, `users/${userId}`);
+    const userDoc = await getDoc(userRef);
+  
+    if (userDoc.exists()) {
+      const userData = userDoc.data();
+      const list = userData['shoppingLists']?.find((list: any) => list.category === category);
+      return list?.products || [];
+    } else {
+      throw new Error('Usuário não encontrado.');
+    }
   }
 
-
-  // Método para adicionar um item comprado na categoria correta
-  addPurchasedItem(item: Iproduct): Observable<Iproduct> {
-    const categoryBuyEndpoint = `${item.category}-Buy`;
-    return this.http.post<Iproduct>(`${this.apiUrl}/${categoryBuyEndpoint}`, item)
-    .pipe(
-      catchError(this.handleError)
-    );
-  }
-
-  // Método para remover um item comprado usando a categoria correta e ID
-  removePurchasedItem(item: Iproduct): Observable<void> {
-    const categoryBuyEndpoint = `${item.category}-Buy`;
-    return this.http.delete<void>(`${this.apiUrl}/${categoryBuyEndpoint}/${item.id}`)
-    .pipe(
-      catchError(this.handleError)
-    );
-  }
-
-  // Método para adicionar o item de volta à lista de compras original
-  addBackToShoppingList(item: Iproduct): Observable<Iproduct> {
-    return this.http.post<Iproduct>(`${this.apiUrl}/${item.category}`, item)
-    .pipe(
-      catchError(this.handleError)
-    );
-  }
+ 
 }
