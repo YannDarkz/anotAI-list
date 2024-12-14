@@ -6,6 +6,7 @@ import { Iproduct } from '../../interfaces/item-list';
 import { ShoppingListService } from '../../services/shopping-list/shopping-list.service';
 import { UserDataService } from '../../services/user-data/user-data.service';
 import { map, firstValueFrom } from 'rxjs';
+import { v4 as uuidv4 } from 'uuid';
 
 @Component({
   selector: 'app-add-items',
@@ -17,28 +18,28 @@ import { map, firstValueFrom } from 'rxjs';
 })
 export class AddItemsComponent {
 
-  
+
   @Output() itemUpdated = new EventEmitter<void>()
   @Output() notifyAddItem = new EventEmitter<void>()
   @Output() notifyEditItem = new EventEmitter<void>()
-  
+
   constructor(private currencyPipe: CurrencyPipe, private formBuilder: FormBuilder, private productService: ShoppingListService, private userDataService: UserDataService) { }
 
   currentItemCategory: string | null = null;
   currentItemId: string | null = null
-  
+
   addItemForm = this.formBuilder.group({
     name: ['', Validators.required],
-    price: ['' , [Validators.required, Validators.min(0)]],
+    price: ['', [Validators.required, Validators.min(0)]],
     quantity: [1, [Validators.required, Validators.min(1)]],
     category: ['', Validators.required]
   });
 
-   formatPrice(): void {
+  formatPrice(): void {
     const priceControl = this.addItemForm.get('price');
     let value = priceControl?.value?.toString().replace(/\D/g, '');
     if (value) {
-      value = (parseInt(value) / 100).toFixed(2); 
+      value = (parseInt(value) / 100).toFixed(2);
       priceControl?.setValue(value.replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.'), { emitEvent: false });
     }
   }
@@ -50,32 +51,31 @@ export class AddItemsComponent {
 
   async addItem(): Promise<void> {
     try {
-      console.log('nois');
-      
+
       const userId = await firstValueFrom(this.userDataService.getUserId());
       const numericUserId = userId ? userId.split('|')[1] : '';
-  
+
       if (!numericUserId) {
         throw new Error('User ID is undefined.');
       }
-  
+
       const formValue = { ...this.addItemForm.value } as unknown as Iproduct;
       formValue.price = this.convertFormattedPriceToNumber(formValue.price.toString()).toFixed(2);
-  
+
       const newItem: Iproduct = {
         ...formValue,
+        id: uuidv4(),
         userId: numericUserId,
+
       };
-  
+
       const newCategory = newItem.category?.toLowerCase();
-      console.log('nois3');
-  
+
       if (this.editing && this.currentItemId !== null) {
         if (newCategory !== this.currentItemCategory) {
           // Remove o item da categoria antiga e adiciona à nova
           await this.productService.deleteItem(numericUserId, this.currentItemCategory!, this.currentItemId);
           await this.productService.addItem(numericUserId, newCategory!, newItem);
-          console.log('noiscat');
         } else {
           // Atualiza o item na mesma categoria
           await this.productService.updateItem(numericUserId, this.currentItemCategory!, this.currentItemId, newItem);
@@ -90,31 +90,31 @@ export class AddItemsComponent {
         this.notifyAddItem.emit();
         this.itemUpdated.emit();
       }
-  
+
       this.addItemForm.reset();
       this.editing = false;
       this.currentItemId = null;
       this.currentItemCategory = null;
     } catch (error) {
       console.log('nada é');
-      
+
       console.error('Erro ao adicionar item:', error);
     }
   }
 
   convertFormattedPriceToNumber(formattedPrice: string): number {
-    
+
     if (!formattedPrice) return 0;
     const cleanPrice = formattedPrice.replace(/\./g, '').replace(',', '.');
     const parsedPrice = parseFloat(cleanPrice);
-    
+
     return isNaN(parsedPrice) ? 0 : parsedPrice;
   }
 
   startEdit(item: Iproduct, category: string): void {
     this.addItemForm.patchValue(item);
     this.editing = true;
-    this.currentItemId = item.id; 
+    this.currentItemId = item.id;
     this.currentItemCategory = category;
   }
 
