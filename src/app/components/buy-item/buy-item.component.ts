@@ -14,7 +14,7 @@ import { Iproduct } from '../../interfaces/item-list';
   styleUrl: './buy-item.component.scss',
   providers: [ShoppingListService]
 })
-export class BuyItemComponent implements OnInit {
+export class BuyItemComponent  {
 
   constructor(private shoppingService: ShoppingListService,  private itemUpdateService: ItemUpdateService) {}
 
@@ -26,8 +26,6 @@ export class BuyItemComponent implements OnInit {
   ];
 
   openCategory: string | null = null;
-
-
   
   buyPrice: number = 0
 
@@ -38,16 +36,18 @@ export class BuyItemComponent implements OnInit {
     this.loadPurchasedItems();
   }
 
-  loadPurchasedItems(): void {
-   this.purchasedItems.forEach((categoryObj) => {
-    this.shoppingService.getPurchasedItems(categoryObj.category).subscribe({
-      next: (items) => {
+  async loadPurchasedItems(): Promise<void> {
+    for (const categoryObj of this.purchasedItems) {
+      try {
+        const items = await this.shoppingService.getPurchasedItems(categoryObj.category);
         categoryObj.products = items;
-        this.calculateTotalPrice()
-      },
-      error: (error) => console.error(`Erro ao carregar itens comprados da categoria ${categoryObj.category}:`, error)
-    })
-   })
+        this.calculateTotalPrice();
+      } catch (error) {
+        console.error(`Erro ao carregar itens comprados da categoria ${categoryObj.category}:`, error);
+      }
+    }
+    console.log('pu', this.purchasedItems);
+    
   }
 
   toggleDetails(category: string): void {
@@ -98,33 +98,39 @@ export class BuyItemComponent implements OnInit {
     return isNaN(parsedPrice) ? 0 : parsedPrice;
   }
 
-  removeFromPurchasedItems(category: string, index: number): void {
-    const categoryObj = this.purchasedItems.find(cat => cat.category === category);
-    if (!categoryObj) return;
+  // removeFromPurchasedItems(category: string, index: number): void {
+  //   const categoryObj = this.purchasedItems.find(cat => cat.category === category);
+  //   if (!categoryObj) return;
 
-    const itemToRemove = categoryObj.products[index];
+  //   const itemToRemove = categoryObj.products[index];
 
-    // Remover o item do array de comprados e do servidor
-    this.shoppingService.removePurchasedItem(itemToRemove).subscribe({
-      next: () => {
-        categoryObj.products.splice(index, 1);
-        this.calculateTotalPrice();
-        this.itemRemoved.emit();
-        this.removeItemBuy.emit();
+  //   // Remover o item do array de comprados e do servidor
+  //   this.shoppingService.removePurchasedItem(itemToRemove).subscribe({
+  //     next: () => {
+  //       categoryObj.products.splice(index, 1);
+  //       this.calculateTotalPrice();
+  //       this.itemRemoved.emit();
+  //       this.removeItemBuy.emit();
 
-        // Adicionar o item de volta à lista de compras original
-        this.shoppingService.addBackToShoppingList(itemToRemove).subscribe({
-          next: () => {
-           console.log('Item adicionado de volta à lista de compras');
-           this.itemUpdateService.triggerUpdateItems();
-          },
+  //       // Adicionar o item de volta à lista de compras original
+  //       this.shoppingService.addBackToShoppingList(itemToRemove).subscribe({
+  //         next: () => {
+  //          console.log('Item adicionado de volta à lista de compras');
+  //          this.itemUpdateService.triggerUpdateItems();
+  //         },
             
-          error: (error) => console.error("Erro ao retornar item para a lista de compras:", error)
-        });
-      },
-      error: (error) => console.error("Erro ao remover item comprado:", error)
-    });
+  //         error: (error) => console.error("Erro ao retornar item para a lista de compras:", error)
+  //       });
+  //     },
+  //     error: (error) => console.error("Erro ao remover item comprado:", error)
+  //   });
+  // }
+
+  removeFromPurchasedItemst(eu: string, indexy: number){
+    console.log('euu');
+    
   }
+  
 }
 
 
