@@ -26,7 +26,7 @@ import { UserService } from '../../services/user/user.service';
   templateUrl: './list-items.component.html',
   styleUrl: './list-items.component.scss'
 })
-export class ListItemsComponent implements OnInit, OnDestroy {
+export class ListItemsComponent   {
 
   userData: Iuser | null = null
   userId: string | undefined = undefined
@@ -55,7 +55,6 @@ export class ListItemsComponent implements OnInit, OnDestroy {
   @ViewChild(BuyItemComponent) buyItemComponent!: BuyItemComponent;
 
   ngOnInit(): void {
-    console.log("dados list",  this.categoriesWithItems)
     
     this.userService.error$.subscribe(errorMsg => {
       this.messageError = errorMsg;
@@ -78,7 +77,6 @@ export class ListItemsComponent implements OnInit, OnDestroy {
         
       }
     });
-    // console.log("dados list",  this.categoriesWithItems[0].products[0].price);
   }
 
   ngOnDestroy(): void {
@@ -94,38 +92,54 @@ export class ListItemsComponent implements OnInit, OnDestroy {
   }
 
   loadItems(): void {
-    const loadObservables = this.categoriesWithItems.map(categoryObj =>
-      this.http.getItemsByCategory(categoryObj.category, this.userId!).pipe(
+  const loadObservables = this.categoriesWithItems.map(async (categoryObj) => {
+    if (this.userId) {
+      try {
+        const data = await this.http.getItemsByCategory(this.userId, categoryObj.category);
+        categoryObj.products = data || [];
+      } catch (error) {
+        this.showError(error instanceof Error ? error.message : 'Erro ao carregar itens.');
+      }
+    }
+  });
 
-        tap(data => categoryObj.products = data.map(item => ({
-          
-          ...item,
-          // price: this.convertFormattedPriceToNumber(item.price).toString()
-        }))),
-        catchError(error => {
-          this.showError(error.message);
-          console.log("error", error.message);
-          return of(null);
-        })
-      )
-    );
-    
-    forkJoin(loadObservables).subscribe({
-      next: () => {
-        this.calculateTotalPrice()
-      },
-      error: (err) => console.error("Erro ao carregar itens:", err)
-    });
+  Promise.all(loadObservables).then(() => {
+    this.calculateTotalPrice();
+  });
+}
 
+async deleteItem(category: string, itemId: string): Promise<void> {
+  if (this.userId) {
+    try {
+      await this.http.deleteItem(this.userId, category, itemId);
+      this.loadItems();
+      this.notifyRemoveItem();
+    } catch (error) {
+      console.error('Erro ao deletar item:', error);
+    }
   }
+}
+
+async buyItem(item: Iproduct, category: string, id: string): Promise<void> {
+
+  if (this.userId) {
+    try {
+      await this.http.addItemBuy(this.userId, category, item);
+      await this.http.deleteItem(this.userId, category, id);
+      this.loadItems();
+      // this.buyItemComponent.loadPurchasedItems();
+      this.notifyAddBuyItem();
+    } catch (error) {
+      console.error('Erro ao comprar item:', error);
+    }
+  }
+}
 
   calculateTotalPrice(): void {
     this.totalPrice = this.categoriesWithItems
       .reduce((acc, categoryObj) => {
         const categoryTotal = (categoryObj.products || []).reduce((sum, item) => {
-          // console.log('Tipo da variável item.price:', typeof item.price, item.price);
           const price = this.convertFormattedPriceToNumber(item.price);
-          // console.log('Tipo da variável price:', typeof price, price);
           const quantity = item.quantity || 1;
           return sum + price * quantity;
         }, 0);
@@ -159,44 +173,44 @@ export class ListItemsComponent implements OnInit, OnDestroy {
     }
   }
 
-  deleteItem(category: string, itemId: string): void {
+  // deleteItem(category: string, itemId: string): void {
 
-    this.http.deleteItem(category, itemId).subscribe({
-      next: () => {
-        this.loadItems();
-        this.notifyRemoveItem()
-      },
-      error: (err) => console.error("Erro ao deletar item:", err)
-    });
-  }
+  //   this.http.deleteItem(category, itemId).subscribe({
+  //     next: () => {
+  //       this.loadItems();
+  //       this.notifyRemoveItem()
+  //     },
+  //     error: (err) => console.error("Erro ao deletar item:", err)
+  //   });
+  // }
 
-  buyItem(item: Iproduct, category: string, index: number): void {
-    const buyCategory = `${category}-Buy`;
-    console.log("item", item);
+  // buyItem(item: Iproduct, category: string, index: number): void {
+  //   const buyCategory = `${category}-Buy`;
+  //   console.log("item", item);
 
-    this.http.addItem(buyCategory, item).subscribe({
-      next: () => {
-        const categoryObj = this.categoriesWithItems.find(cat => cat.category === category);
-        if (categoryObj) {
-          categoryObj.products.splice(index, 1);
-        }
+  //   this.http.addItem(buyCategory, item).subscribe({
+  //     next: () => {
+  //       const categoryObj = this.categoriesWithItems.find(cat => cat.category === category);
+  //       if (categoryObj) {
+  //         categoryObj.products.splice(index, 1);
+  //       }
 
 
-        this.http.deleteItem(category, item.id).subscribe({
-          next: () => {
-            // this.saveItems();
-            this.loadItems();
+  //       this.http.deleteItem(category, item.id).subscribe({
+  //         next: () => {
+  //           // this.saveItems();
+  //           this.loadItems();
 
-            // Carregar novamente os itens comprados e emitir o evento
-            this.buyItemComponent.loadPurchasedItems();
-            this.notifyAddBuyItem();
-          },
-          error: (err) => console.error("Erro ao deletar item da categoria original:", err)
-        });
-      },
-      error: (err) => console.error("Erro ao adicionar item na categoria comprados:", err)
-    });
-  }
+  //           // Carregar novamente os itens comprados e emitir o evento
+  //           this.buyItemComponent.loadPurchasedItems();
+  //           this.notifyAddBuyItem();
+  //         },
+  //         error: (err) => console.error("Erro ao deletar item da categoria original:", err)
+  //       });
+  //     },
+  //     error: (err) => console.error("Erro ao adicionar item na categoria comprados:", err)
+  //   });
+  // }
 
   toggleDetails(category: string): void {
     if (this.openCategory === category) {
@@ -221,30 +235,12 @@ export class ListItemsComponent implements OnInit, OnDestroy {
             return category
           }
         }
-
-        // saveItems(): void {
-        //   localStorage.setItem('itensCategory', JSON.stringify(this.itemsByCategory));
-        // }
-  
-  // get objectKeys() {
-    //   return Object.keys;
-    // }
-    
-    // getItemsByCategory(category: keyof typeof this.itemsByCategory): Iproduct[] {
-      //   return this.itemsByCategory[category] || [];
-      // }
-      
-
-  // clearListBuy(): void {
-    //   localStorage.removeItem('listaComprados');
-    // }
-
     clearList(): void {
       localStorage.removeItem('listaCompras');
     }
 
   scrollToTop(): void {
-    const scrollDuration = 30; // Tempo total em ms
+    const scrollDuration = 30; 
     const startPosition = window.scrollY;
     const startTime = performance.now();
 
