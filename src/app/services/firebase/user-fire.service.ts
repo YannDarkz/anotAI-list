@@ -19,7 +19,7 @@ export interface Icategory {
 
 const defaultCategories: Icategory[] = [
   { category: 'cold', products: [] },
-  { category: 'others', products: [] },
+  { category: 'cleaning', products: [] },
   { category: 'perishables', products: [] },
   { category: 'others', products: [] }
 ];
