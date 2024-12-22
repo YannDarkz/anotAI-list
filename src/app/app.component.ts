@@ -27,7 +27,7 @@ export class AppComponent implements OnInit {
   ngOnInit() {
     this.auth.isAuthenticated$.subscribe((isAuthenticated) => {
       if (isAuthenticated) {
-        this.router.navigate(['/listItems']);
+        // this.router.navigate(['/listItems']);
 
         this.auth.user$.subscribe(user => {
           if (user) {
