@@ -5,6 +5,9 @@ import { CardBuyItemComponent } from '../card-buy-item/card-buy-item.component';
 import { ShoppingListService } from '../../services/shopping-list/shopping-list.service';
 import { ItemUpdateService } from '../../services/itemUpdate/item-update.service';
 import { Iproduct } from '../../interfaces/item-list';
+import { UserDataService } from '../../services/user-data/user-data.service';
+
+import { filter } from 'rxjs/operators';
 
 @Component({
   selector: 'app-buy-item',
@@ -14,11 +17,13 @@ import { Iproduct } from '../../interfaces/item-list';
   styleUrl: './buy-item.component.scss',
   providers: [ShoppingListService]
 })
-export class BuyItemComponent  {
+export class BuyItemComponent {
 
-  constructor(private shoppingService: ShoppingListService,  private itemUpdateService: ItemUpdateService) {}
+  userId: string | undefined = undefined;
 
-   purchasedItems: { category: string; products: Iproduct[] }[] = [
+  constructor(private shoppingService: ShoppingListService, private userData: UserDataService, private itemUpdateService: ItemUpdateService) { }
+
+  purchasedItems: { category: string; products: Iproduct[] }[] = [
     { category: 'cold', products: [] },
     { category: 'perishables', products: [] },
     { category: 'cleaning', products: [] },
@@ -26,20 +31,30 @@ export class BuyItemComponent  {
   ];
 
   openCategory: string | null = null;
-  
+
   buyPrice: number = 0
 
   @Output() itemRemoved = new EventEmitter<void>();
   @Output() removeItemBuy = new EventEmitter<void>()
 
-  ngOnInit(): void {
-    this.loadPurchasedItems();
+  async ngOnInit(): Promise<void> {
+    this.userData.getUserData().pipe(
+      filter(data => data !== null) // Ignora valores `null`
+    )
+      .subscribe(data => {
+        if (data?.userId) {
+          this.userId = data.userId;
+          this.loadPurchasedItems(); // Agora só será chamado quando houver um `userId`
+        } else {
+          console.error('User ID não encontrado após filtragem.');
+        }
+      });
   }
 
   async loadPurchasedItems(): Promise<void> {
     for (const categoryObj of this.purchasedItems) {
       try {
-        const items = await this.shoppingService.getPurchasedItems(categoryObj.category);
+        const items = await this.shoppingService.getPurchasedItems(this.userId, categoryObj.category);
         categoryObj.products = items;
         this.calculateTotalPrice();
       } catch (error) {
@@ -47,11 +62,22 @@ export class BuyItemComponent  {
       }
     }
     console.log('pu', this.purchasedItems);
-    
+
+  }
+
+  resetPurchasedItems(): void {
+    if (!this.userId) {
+      console.error('User ID não definido.');
+      return;
+    }
+
+    this.shoppingService.resetPurchasedItems(this.userId)
+      .then(() => console.log('Estrutura restaurada no Firebase.'))
+      .catch(error => console.error('Erro ao restaurar estrutura:', error));
   }
 
   toggleDetails(category: string): void {
-    if(this.openCategory === category) {
+    if (this.openCategory === category) {
       this.openCategory = null;
     } else {
       this.openCategory = category;
@@ -66,7 +92,7 @@ export class BuyItemComponent  {
     );
 
     console.log(this.buyPrice);
-    
+
   }
 
   calculateTotalPrice(): void {
@@ -76,7 +102,7 @@ export class BuyItemComponent  {
           // console.log('Tipo da variável item.price:', typeof item.price, item.price);
           const price = this.convertFormattedPriceToNumber(item.price);
           // console.log('Tipo da variável price:', typeof price, price);
-          
+
           const quantity = item.quantity || 1;
           return sum + price * quantity;
         }, 0);
@@ -88,13 +114,13 @@ export class BuyItemComponent  {
     if (!formattedPrice) return 0;
 
     // console.log("chegando", formattedPrice, typeof formattedPrice);
-    
+
     // const cleanPrice = formattedPrice.replace(/\./g, '').replace(',', '.');
     // const cleanPrice = formattedPrice.replace(',', '.');
     // console.log("meio", cleanPrice, typeof cleanPrice);
     const parsedPrice = Number.parseFloat(formattedPrice);
     // console.log("fim?",  typeof cleanPrice,  typeof parsedPrice, this.maskCurrency(parsedPrice), "karai", parseFloat(this.maskCurrency(parsedPrice)) );
-    
+
     return isNaN(parsedPrice) ? 0 : parsedPrice;
   }
 
@@ -118,7 +144,7 @@ export class BuyItemComponent  {
   //          console.log('Item adicionado de volta à lista de compras');
   //          this.itemUpdateService.triggerUpdateItems();
   //         },
-            
+
   //         error: (error) => console.error("Erro ao retornar item para a lista de compras:", error)
   //       });
   //     },
@@ -126,11 +152,35 @@ export class BuyItemComponent  {
   //   });
   // }
 
-  removeFromPurchasedItemst(eu: string, indexy: number){
-    console.log('euu');
-    
+  removeFromPurchasedItemst(category: string, index: number) {
+    if (!this.userId) {
+      console.error('User ID não encontrado.');
+      return;
+    }
+
+    const categoryObj = this.purchasedItems.find(cat => cat.category === category);
+    if (!categoryObj) {
+      console.error(`Categoria ${category} não encontrada.`);
+      return;
+    }
+
+    const itemToRemove = categoryObj.products[index];
+
+    // Remove da lista de comprados e adiciona de volta à lista de compras
+    this.shoppingService
+      .removeFromPurchased(this.userId, itemToRemove, category)
+      .then(() => this.shoppingService.addToShoppingList(this.userId!, itemToRemove, category))
+      .then(() => {
+        categoryObj.products.splice(index, 1); // Remove o item localmente
+        this.calculateTotalPrice(); // Atualiza o preço total
+        console.log('Item movido para a lista de compras com sucesso.');
+      })
+      .catch(error => {
+        console.error('Erro ao mover o item:', error);
+      });
+
   }
-  
+
 }
 
 

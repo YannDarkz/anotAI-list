@@ -11,29 +11,17 @@
          [name]="item.name"
           [price]="item.price"
           [quantity]="item.quantity"
-          (remove)="removeFromPurchasedItems(categoryObj.category, i)"></app-card-buy-item>
+          (remove)="removeFromPurchasedItemst(categoryObj.category, i)"></app-card-buy-item>
       </li>
     </ul>
 
   </details>
   </ng-container>
 
+  <button (click)="resetPurchasedItems()">rest</button>
+
   <ng-template #noItems>
     <p class="text-default">Nenhum item foi adicionado ainda 🛒.</p>
   </ng-template>
 </div>
 
-<!-- 
-<div *ngFor="let categoryObj of categoriesWithItems">
-   <details>
-    <summary>{{ categoriaPT(categoryObj.category) | uppercase }}</summary>
-    <ul *ngIf="categoryObj.products.length > 0; else noItems">
-      <li *ngFor="let item of categoryObj.products; let i = index">
-        <app-card-list [name]="item.name" [price]="convertFormattedPriceToNumber(item.price) | currency:'BRL'"
-          [quantity]="item.quantity" (edit)="editItem(item, i, categoryObj.category)"
-          (delete)="deleteItem(categoryObj.category, item.id)"
-          (buy)="buyItem(item, categoryObj.category, i)"></app-card-list>
-      </li>
-    </ul>
-  </details>
-  </div> -->
