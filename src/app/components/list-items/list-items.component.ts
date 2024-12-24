@@ -35,7 +35,9 @@ export class ListItemsComponent   {
   constructor(private userService: UserService, private http: ShoppingListService, private itemUpdateService: ItemUpdateService, private userDataService: UserDataService) { }
 
 
-  categories = ['cold', 'perishables', 'cleaning', 'others'];
+  // categories = ['cold', 'perishables', 'cleaning', 'others'];
+
+
 
   addTextNotify = '';
   messageError = '';
@@ -53,6 +55,8 @@ export class ListItemsComponent   {
 
   @ViewChild(AddItemsComponent) addItemsComponent!: AddItemsComponent;
   @ViewChild(BuyItemComponent) buyItemComponent!: BuyItemComponent;
+
+  
 
   ngOnInit(): void {
     
@@ -172,45 +176,6 @@ async buyItem(item: Iproduct, category: string, id: string): Promise<void> {
       console.log('addItemsComponent não está inicializado');
     }
   }
-
-  // deleteItem(category: string, itemId: string): void {
-
-  //   this.http.deleteItem(category, itemId).subscribe({
-  //     next: () => {
-  //       this.loadItems();
-  //       this.notifyRemoveItem()
-  //     },
-  //     error: (err) => console.error("Erro ao deletar item:", err)
-  //   });
-  // }
-
-  // buyItem(item: Iproduct, category: string, index: number): void {
-  //   const buyCategory = `${category}-Buy`;
-  //   console.log("item", item);
-
-  //   this.http.addItem(buyCategory, item).subscribe({
-  //     next: () => {
-  //       const categoryObj = this.categoriesWithItems.find(cat => cat.category === category);
-  //       if (categoryObj) {
-  //         categoryObj.products.splice(index, 1);
-  //       }
-
-
-  //       this.http.deleteItem(category, item.id).subscribe({
-  //         next: () => {
-  //           // this.saveItems();
-  //           this.loadItems();
-
-  //           // Carregar novamente os itens comprados e emitir o evento
-  //           this.buyItemComponent.loadPurchasedItems();
-  //           this.notifyAddBuyItem();
-  //         },
-  //         error: (err) => console.error("Erro ao deletar item da categoria original:", err)
-  //       });
-  //     },
-  //     error: (err) => console.error("Erro ao adicionar item na categoria comprados:", err)
-  //   });
-  // }
 
   toggleDetails(category: string): void {
     if (this.openCategory === category) {
