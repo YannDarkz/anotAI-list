@@ -13,30 +13,26 @@ import { catchError } from 'rxjs/operators';
 export class ShoppingListService {
 
   constructor( private firestore: Firestore) { }
-  
-  private apiUrl = 'http://localhost:3000';
 
-  private handleError(error: HttpErrorResponse): Observable<never> {
-    let errorMessage = 'Ocorreu um erro inesperado. Tente novamente em alguns segundos.'
-    if (error.error instanceof ErrorEvent) {
-      errorMessage = `Erro: ${error.error.message}`
-    } else {
-      switch (error.status) {
-        case 404:
-        errorMessage = 'Recurso não encontrado.';
-        break;
-        case 500:
-          errorMessage = 'Erro interno do servidor.';
-          break;
-          default:
-            errorMessage = `Erro ${error.status}: ${error.message}`
-            break;
-      }
+  async resetPurchasedItems(userId: string): Promise<void> {
+    const userRef = doc(this.firestore, `users/${userId}`);
+    const defaultStructure = {
+      purchasedItems: {
+        cold: [],
+        perishables: [],
+        cleaning: [],
+        others: [],
+      },
+    };
+
+    try {
+      await setDoc(userRef, defaultStructure, { merge: true });
+      console.log('Estrutura de purchasedItems restaurada com sucesso.');
+    } catch (error) {
+      console.error('Erro ao restaurar purchasedItems:', error);
+      throw error;
     }
-
-    return throwError(() => new Error(errorMessage))
   }
-
 
   async addItem(userId: string, category: string, item: Iproduct): Promise<void> {
     
@@ -144,19 +140,46 @@ export class ShoppingListService {
     }
   }
 
-  async getPurchasedItems(category: string): Promise<Iproduct[]> {
-    const collectionRef = collection(this.firestore, 'purchasedItems');
-    const q = query(collectionRef, where('category', '==', category));
-    const querySnapshot = await getDocs(q);
-    return querySnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id })) as Iproduct[];
+  async getPurchasedItems(userId: string | undefined, category: string): Promise<Iproduct[]> {
+    try {
+      // Acessa o documento do usuário
+      const userRef = doc(this.firestore, `users/${userId}`);
+      const userDoc = await getDoc(userRef);
+  
+      if (userDoc.exists()) {
+        const userData = userDoc.data();
+        
+        // Procura dentro das listas compradas, filtrando pela categoria
+        const purchasedList = userData['purchasedItems']?.find(
+          (list: any) => list.category === category
+        );
+  
+        if (purchasedList) {
+          return purchasedList.products || [];
+        } else {
+          console.warn('Nenhum item comprado encontrado para a categoria:', category);
+          return [];
+        }
+      } else {
+        throw new Error('Usuário não encontrado.');
+      }
+    } catch (error) {
+      console.error('Erro ao obter itens comprados:', error);
+      throw error;
+    }
   }
+ async removeFromPurchased(userId: string, item: Iproduct, category: string): Promise<void> {
+  const purchasedRef = doc(this.firestore, `users/${userId}`);
+  await updateDoc(purchasedRef, {
+    [`purchasedItems.${category}`]: arrayRemove(item)
+  })
+ }
 
-  async removePurchasedItem() {
-    console.log("remover item comprado");
-  }
-
-  async addBackToShoppingList() {
-    console.log("adicionar item de volta a lista de compras");
+  async addToShoppingList(userId: string, item: Iproduct, category: string): Promise<void> {
+    const shoppingRef = doc(this.firestore, `users/${userId}`);
+    await updateDoc(shoppingRef, {
+      [`shoppingLists.${category}`]: arrayUnion(item)
+    })
   }
 
 
