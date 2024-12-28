@@ -4,7 +4,7 @@ import { canActivateGuard } from './guards/auth/can-activate.guard';
 import { ListItemsComponent } from './components/list-items/list-items.component';
 import { HomeComponent } from './components/home/home.component';
 import { NotFoundComponent } from './components/not-found/not-found.component';
-import { AddItemsComponent } from './components/add-items/add-items.component';
+import { BuyItemComponent } from './components/buy-item/buy-item.component';
 
 export const routes: Routes = [
     {
@@ -14,12 +14,12 @@ export const routes: Routes = [
         
     },
     
-    // {
-    //     path: 'addItems',
-    //     component: AddItemsComponent,
-    //     canActivate: [canActivateGuard],
+    {
+        path: 'buyItems',
+        component: BuyItemComponent,
+        canActivate: [canActivateGuard],
         
-    // },
+    },
     {
         path: '',
         component: HomeComponent,
