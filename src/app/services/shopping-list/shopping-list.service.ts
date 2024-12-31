@@ -34,6 +34,26 @@ export class ShoppingListService {
     }
   }
 
+  async resetShoppingList(userId: string): Promise<void> {
+    const userRef = doc(this.firestore, `users/${userId}`);
+    const defaultStructure = {
+      shoppingList: {
+        cold: [],
+        perishables: [],
+        cleaning: [],
+        others: [],
+      },
+    };
+
+    try {
+      await setDoc(userRef, defaultStructure, { merge: true });
+      console.log('Estrutura de shoppingList restaurada com sucesso.');
+    } catch (error) {
+      console.error('Erro ao restaurar shoppingList:', error);
+      throw error;
+    }
+  }
+
   async addItem(userId: string, category: string, item: Iproduct): Promise<void> {
     
     const userRef = doc(this.firestore, `users/${userId}`);
