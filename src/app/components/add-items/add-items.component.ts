@@ -8,6 +8,8 @@ import { UserDataService } from '../../services/user-data/user-data.service';
 import { map, firstValueFrom } from 'rxjs';
 import { v4 as uuidv4 } from 'uuid';
 
+import { Firestore, getDoc, doc, updateDoc } from '@angular/fire/firestore';
+
 @Component({
   selector: 'app-add-items',
   standalone: true,
@@ -23,7 +25,7 @@ export class AddItemsComponent {
   @Output() notifyAddItem = new EventEmitter<void>()
   @Output() notifyEditItem = new EventEmitter<void>()
 
-  constructor(private currencyPipe: CurrencyPipe, private formBuilder: FormBuilder, private productService: ShoppingListService, private userDataService: UserDataService) { }
+  constructor( private firestore: Firestore, private formBuilder: FormBuilder, private productService: ShoppingListService, private userDataService: UserDataService) { }
 
   currentItemCategory: string | null = null;
   currentItemId: string | null = null
@@ -51,54 +53,80 @@ export class AddItemsComponent {
 
   async addItem(): Promise<void> {
     try {
-
       const userId = await firstValueFrom(this.userDataService.getUserId());
       const numericUserId = userId ? userId.split('|')[1] : '';
-
+  
       if (!numericUserId) {
         throw new Error('User ID is undefined.');
       }
-
+  
       const formValue = { ...this.addItemForm.value } as unknown as Iproduct;
       formValue.price = this.convertFormattedPriceToNumber(formValue.price.toString()).toFixed(2);
-
+  
       const newItem: Iproduct = {
         ...formValue,
         id: uuidv4(),
         userId: numericUserId,
-
       };
-
+  
       const newCategory = newItem.category?.toLowerCase();
-
-      if (this.editing && this.currentItemId !== null) {
-        if (newCategory !== this.currentItemCategory) {
-          // Remove o item da categoria antiga e adiciona à nova
-          await this.productService.deleteItem(numericUserId, this.currentItemCategory!, this.currentItemId);
-          await this.productService.addItem(numericUserId, newCategory!, newItem);
-        } else {
-          // Atualiza o item na mesma categoria
-          await this.productService.updateItem(numericUserId, this.currentItemCategory!, this.currentItemId, newItem);
-        }
-        this.notifyEditItem.emit();
-        this.itemUpdated.emit();
-      } else if (newCategory) {
-        // Adiciona um novo item
-        console.log('noistt');
-        await this.productService.addItem(numericUserId, newCategory, newItem);
-
-        this.notifyAddItem.emit();
-        this.itemUpdated.emit();
+      if (!newCategory) {
+        throw new Error('Category is undefined.');
       }
-
+  
+      const userRef = doc(this.firestore, `users/${numericUserId}`);
+      const userDoc = await getDoc(userRef);
+  
+      if (!userDoc.exists()) {
+        throw new Error('User not found.');
+      }
+  
+      const userData = userDoc.data();
+      const currentShoppingList = userData['shoppingList'] || {};
+  
+      if (this.editing && this.currentItemId !== null) {
+        // Edição de item
+        if (newCategory !== this.currentItemCategory) {
+          // Remover o item da categoria antiga
+          const oldCategoryItems = [...(currentShoppingList[this.currentItemCategory!] || [])];
+          const filteredItems = oldCategoryItems.filter(item => item.id !== this.currentItemId);
+          currentShoppingList[this.currentItemCategory!] = filteredItems;
+  
+          // Adicionar o item à nova categoria
+          const newCategoryItems = [...(currentShoppingList[newCategory] || []), newItem];
+          currentShoppingList[newCategory] = newCategoryItems;
+  
+        } else {
+          // Atualizar o item na mesma categoria
+          const categoryItems = [...(currentShoppingList[newCategory] || [])];
+          const updatedItems = categoryItems.map(item =>
+            item.id === this.currentItemId ? newItem : item
+          );
+          currentShoppingList[newCategory] = updatedItems;
+        }
+  
+        this.notifyEditItem.emit();
+      } else {
+        // Adição de novo item
+        const updatedCategoryItems = [...(currentShoppingList[newCategory] || []), newItem];
+        currentShoppingList[newCategory] = updatedCategoryItems;
+  
+        this.notifyAddItem.emit();
+      }
+  
+      // Atualiza o documento no Firebase
+      await updateDoc(userRef, { shoppingList: currentShoppingList });
+  
+      // Resetando o estado
       this.addItemForm.reset();
       this.editing = false;
       this.currentItemId = null;
       this.currentItemCategory = null;
+      this.itemUpdated.emit();
+  
+      console.log('Operação concluída com sucesso.');
     } catch (error) {
-      console.log('nada é');
-
-      console.error('Erro ao adicionar item:', error);
+      console.error('Erro ao adicionar/editar item:', error);
     }
   }
 
