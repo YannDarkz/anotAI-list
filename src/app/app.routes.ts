@@ -13,13 +13,6 @@ export const routes: Routes = [
         canActivate: [canActivateGuard],
         
     },
-    
-    {
-        path: 'buyItems',
-        component: BuyItemComponent,
-        canActivate: [canActivateGuard],
-        
-    },
     {
         path: '',
         component: HomeComponent,
