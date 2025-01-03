@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ViewChild, } from '@angular/core';
+import { Component, ViewChild, } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CardListComponent } from '../card-list/card-list.component';
 import { AddItemsComponent } from '../add-items/add-items.component';
@@ -7,6 +7,7 @@ import { AuthButtonsComponent } from '../auth-buttons/auth-buttons.component';
 
 import { Iproduct } from '../../interfaces/item-list';
 import { Iuser } from '../../interfaces/user';
+import { Icategory } from '../../services/firebase/user-fire.service';
 
 import { UserDataService } from '../../services/user-data/user-data.service';
 import { ShoppingListService } from '../../services/shopping-list/shopping-list.service';
@@ -14,9 +15,7 @@ import { ItemUpdateService } from '../../services/itemUpdate/item-update.service
 
 
 import { Subscription, forkJoin, of, from } from 'rxjs';
-import { tap, catchError, map } from 'rxjs/operators';
 import { UserService } from '../../services/user/user.service';
-import { Icategory } from '../../services/firebase/user-fire.service';
 
 
 
@@ -67,7 +66,7 @@ export class ListItemsComponent   {
     
     this.userDataService.getUserData().subscribe(data => {
       this.userData = data;
-      console.log("dadosaki", data);
+      // console.log("UserData", data);
       
       this.userId = data?.userId
       
@@ -90,6 +89,10 @@ export class ListItemsComponent   {
     this.addItemsComponent.itemUpdated.subscribe(() => {
       this.loadItems();
     });
+
+    this.buyItemComponent.itemUpdated.subscribe(() => {
+      this.loadItems();
+    });
   }
 
   loadItems(): void {
@@ -110,14 +113,11 @@ export class ListItemsComponent   {
   }
 
 async deleteItem(category: keyof Icategory, itemId: string): Promise<void> {
-  if (this.userId) { // Certifique-se de que o userId está definido
+  if (this.userId) { 
     try {
-      // Chama o serviço para deletar o item
+     
       await this.http.deleteItem(this.userId, category, itemId);
       
-      // Atualiza a lista de itens localmente
-      // this.categoriesWithItems[category as keyof Icategory] = 
-      //   this.categoriesWithItems[category as keyof Icategory].filter(item => item.id !== itemId);
       if (this.categoriesWithItems[category]) {
         this.categoriesWithItems[category] = this.categoriesWithItems[category].filter(item => item.id !== itemId);
         console.log('existentes', this.categoriesWithItems[category]);
@@ -125,10 +125,6 @@ async deleteItem(category: keyof Icategory, itemId: string): Promise<void> {
       } else {
         console.error(`Categoria ${category} não existe localmente.`);
       }
-      
-
-      // Recarrega os dados do backend, se necessário
-      // this.loadItems(); // Use este apenas se precisar garantir a consistência total.
 
       // Exibe uma notificação ao usuário
       this.notifyRemoveItem();
@@ -145,9 +141,11 @@ async buyItem(item: Iproduct, category: keyof Icategory): Promise<void> {
     try {
       // Chama o serviço para mover o item
       await this.http.addItemBuy(this.userId, category, item);
+      this.itemUpdateService.triggerUpdateItems();
 
       // Recarrega os dados da interface
       this.loadItems();
+      this.buyItemComponent.loadPurchasedItems();
       this.notifyAddBuyItem(); // Notifica o usuário
     } catch (error) {
       console.error('Erro ao comprar item:', error);
