@@ -27,7 +27,7 @@ export class AppComponent implements OnInit {
   ngOnInit() {
     this.auth.isAuthenticated$.subscribe((isAuthenticated) => {
       if (isAuthenticated) {
-        // this.router.navigate(['/listItems']);
+        this.router.navigate(['/listItems']);
 
         this.auth.user$.subscribe(user => {
           if (user) {
@@ -41,7 +41,7 @@ export class AppComponent implements OnInit {
             // Salva os dados do usuário no Firestore
             this.userFireService.saveUser(userData)
               .then(() => {
-                console.log('Usuário salvo com sucesso no Firestore.');
+                // console.log('Usuário salvo com sucesso no Firestore.');
                 this.userDataService.setUserData(userData); // Atualiza o serviço com os dados do usuário
               })
               .catch((error) => {
