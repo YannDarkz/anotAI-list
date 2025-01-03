@@ -19,22 +19,28 @@
   <h4>lista de compras 📋</h4>
   <h6><strong>💸 Total:</strong> {{totalPrice | currency:'BRL':'symbol': '1.2-2'}}</h6>
 
-  <div *ngFor="let categoryObj of categoriesWithItems">
-    <details [open]="openCategory === categoryObj.category">
-      <summary (click)="toggleDetails(categoryObj.category)">{{ categoriaPT(categoryObj.category) | uppercase }}
+  <div *ngFor="let category of categoriesWithItems | keyvalue">
+    <details [open]="openCategory === category.key">
+      <summary (click)="toggleDetails(category.key)">
+        {{ categoriaPT(category.key) | uppercase }}
       </summary>
-      <ul *ngIf="categoryObj.products.length > 0; else noItems">
-        <li *ngFor="let item of categoryObj.products; let i = index">
-          <app-card-list [name]="item.name" [price]="convertFormattedPriceToNumber(item.price) | currency:'BRL'"
-            [quantity]="item.quantity" (edit)="editItem(item, i, categoryObj.category)"
-            (delete)="deleteItem(categoryObj.category, item.id)"
-            (buy)="buyItem(item, categoryObj.category, item.id)"></app-card-list>
+      <ul *ngIf="category.value.length > 0; else noItems">
+        <li *ngFor="let item of category.value; let i = index">
+          <app-card-list 
+            [name]="item.name" 
+            [price]="convertFormattedPriceToNumber(item.price) | currency:'BRL'" 
+            [quantity]="item.quantity"
+            (edit)="editItem(item, i, category.key)"
+            (delete)="deleteItem(category.key, item.id)"
+            (buy)="buyItem(item, category.key)">
+          </app-card-list>
+  
           <div class="notification-card" [ngClass]="{'show': addTextNotify, 'none': !addTextNotify}">
-            <h3 class="text-notify">{{addTextNotify}}</h3>
+            <h3 class="text-notify">{{ addTextNotify }}</h3>
           </div>
-
+  
           <div class="notification-card error" [ngClass]="{'show': messageError, 'none': !messageError}">
-            <h3 class="text-notify"> {{messageError}} </h3>
+            <h3 class="text-notify"> {{ messageError }} </h3>
           </div>
         </li>
       </ul>

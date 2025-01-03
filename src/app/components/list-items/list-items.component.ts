@@ -13,9 +13,10 @@ import { ShoppingListService } from '../../services/shopping-list/shopping-list.
 import { ItemUpdateService } from '../../services/itemUpdate/item-update.service';
 
 
-import { Subscription, forkJoin, of } from 'rxjs';
-import { tap, catchError } from 'rxjs/operators';
+import { Subscription, forkJoin, of, from } from 'rxjs';
+import { tap, catchError, map } from 'rxjs/operators';
 import { UserService } from '../../services/user/user.service';
+import { Icategory } from '../../services/firebase/user-fire.service';
 
 
 
@@ -35,19 +36,16 @@ export class ListItemsComponent   {
   constructor(private userService: UserService, private http: ShoppingListService, private itemUpdateService: ItemUpdateService, private userDataService: UserDataService) { }
 
 
-  // categories = ['cold', 'perishables', 'cleaning', 'others'];
-
-
-
   addTextNotify = '';
   messageError = '';
 
-  categoriesWithItems: { category: string; products: Iproduct[] }[] = [
-    { category: 'cold', products: [] },
-    { category: 'perishables', products: [] },
-    { category: 'cleaning', products: [] },
-    { category: 'others', products: [] },
-  ];
+  categoriesWithItems: Icategory = {
+    cold: [],
+    perishables: [],
+    cleaning: [] ,
+    others: []
+
+  };
 
   openCategory: string | null = null;
 
@@ -59,7 +57,6 @@ export class ListItemsComponent   {
   
 
   ngOnInit(): void {
-    
     this.userService.error$.subscribe(errorMsg => {
       this.messageError = errorMsg;
     });
@@ -96,60 +93,80 @@ export class ListItemsComponent   {
   }
 
   loadItems(): void {
-  const loadObservables = this.categoriesWithItems.map(async (categoryObj) => {
-    if (this.userId) {
-      try {
-        const data = await this.http.getItemsByCategory(this.userId, categoryObj.category);
-        categoryObj.products = data || [];
-      } catch (error) {
-        this.showError(error instanceof Error ? error.message : 'Erro ao carregar itens.');
+    const loadPromises = Object.keys(this.categoriesWithItems).map(async (category) => {
+      if (this.userId) {
+        try {
+          const data = await this.http.getItemsByCategory(this.userId, category as keyof Icategory);
+          this.categoriesWithItems[category as keyof Icategory] = data;
+        } catch (error) {
+          this.showError(error instanceof Error ? error.message : 'Erro ao carregar itens.');
+        }
       }
-    }
-  });
+    });
+  
+    Promise.all(loadPromises).then(() => {
+      this.calculateTotalPrice();
+    });
+  }
 
-  Promise.all(loadObservables).then(() => {
-    this.calculateTotalPrice();
-  });
-}
-
-async deleteItem(category: string, itemId: string): Promise<void> {
-  if (this.userId) {
+async deleteItem(category: keyof Icategory, itemId: string): Promise<void> {
+  if (this.userId) { // Certifique-se de que o userId está definido
     try {
+      // Chama o serviço para deletar o item
       await this.http.deleteItem(this.userId, category, itemId);
-      this.loadItems();
+      
+      // Atualiza a lista de itens localmente
+      // this.categoriesWithItems[category as keyof Icategory] = 
+      //   this.categoriesWithItems[category as keyof Icategory].filter(item => item.id !== itemId);
+      if (this.categoriesWithItems[category]) {
+        this.categoriesWithItems[category] = this.categoriesWithItems[category].filter(item => item.id !== itemId);
+        console.log('existentes', this.categoriesWithItems[category]);
+        
+      } else {
+        console.error(`Categoria ${category} não existe localmente.`);
+      }
+      
+
+      // Recarrega os dados do backend, se necessário
+      // this.loadItems(); // Use este apenas se precisar garantir a consistência total.
+
+      // Exibe uma notificação ao usuário
       this.notifyRemoveItem();
     } catch (error) {
       console.error('Erro ao deletar item:', error);
     }
+  } else {
+    console.error('User ID não encontrado.');
   }
 }
 
-async buyItem(item: Iproduct, category: string, id: string): Promise<void> {
-
+async buyItem(item: Iproduct, category: keyof Icategory): Promise<void> {
   if (this.userId) {
     try {
+      // Chama o serviço para mover o item
       await this.http.addItemBuy(this.userId, category, item);
-      await this.http.deleteItem(this.userId, category, id);
+
+      // Recarrega os dados da interface
       this.loadItems();
-      // this.buyItemComponent.loadPurchasedItems();
-      this.notifyAddBuyItem();
+      this.notifyAddBuyItem(); // Notifica o usuário
     } catch (error) {
       console.error('Erro ao comprar item:', error);
     }
+  } else {
+    console.error('User ID não encontrado.');
   }
 }
 
-  calculateTotalPrice(): void {
-    this.totalPrice = this.categoriesWithItems
-      .reduce((acc, categoryObj) => {
-        const categoryTotal = (categoryObj.products || []).reduce((sum, item) => {
-          const price = this.convertFormattedPriceToNumber(item.price);
-          const quantity = item.quantity || 1;
-          return sum + price * quantity;
-        }, 0);
-        return acc + categoryTotal;
-      }, 0);
-  }
+calculateTotalPrice(): void {
+  this.totalPrice = Object.values(this.categoriesWithItems).reduce((acc, items) => {
+    const categoryTotal = items.reduce((sum: number, item: Iproduct) => {
+      const price = this.convertFormattedPriceToNumber(item.price);
+      const quantity = item.quantity || 1;
+      return sum + price * quantity;
+    }, 0);
+    return acc + categoryTotal;
+  }, 0);
+}
 
   convertFormattedPriceToNumber(formattedPrice: string): number {
     if (!formattedPrice) return 0;
