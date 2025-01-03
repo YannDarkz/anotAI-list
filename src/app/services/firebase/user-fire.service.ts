@@ -1,28 +1,23 @@
 import { Injectable } from '@angular/core';
 import { Firestore, collection, doc, setDoc, getDoc, updateDoc } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
+import { Iproduct } from '../../interfaces/item-list';
 
 
-export interface Iproduct {
-  id: string;
-  name: string;
-  price: string;
-  quantity: number;
-  category: string;
-  
-}
+
 export interface Icategory {
-  category: string;
-  products: Iproduct[];
-
+    cold: Iproduct[];
+    perishables: Iproduct[];
+    cleaning: Iproduct[];
+    others: Iproduct[];
 };
 
-const defaultCategories: Icategory[] = [
-  { category: 'cold', products: [] },
-  { category: 'cleaning', products: [] },
-  { category: 'perishables', products: [] },
-  { category: 'others', products: [] }
-];
+const defaultCategories: Icategory = {
+  cold: [],
+  cleaning: [],
+  perishables: [],
+  others: []
+};
 export interface User {
   userId: string;
   name: string;
@@ -56,7 +51,7 @@ export class UserFireService {
       // Cria o documento inicial com listas vazias
       await setDoc(userRef, {
         ...user,
-        shoppingLists: defaultCategories,
+        shoppingList: defaultCategories,
         purchasedItems: defaultCategories
       });
     }
