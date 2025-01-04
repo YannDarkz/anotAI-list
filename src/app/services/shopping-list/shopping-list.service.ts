@@ -16,45 +16,45 @@ export class ShoppingListService {
 
   constructor(private firestore: Firestore) { }
 
-  async resetPurchasedItems(userId: string): Promise<void> {
-    const userRef = doc(this.firestore, `users/${userId}`);
-    const defaultStructure = {
-      purchasedItems: {
-        cold: [],
-        perishables: [],
-        cleaning: [],
-        others: [],
-      },
-    };
+  // async resetPurchasedItems(userId: string): Promise<void> {
+  //   const userRef = doc(this.firestore, `users/${userId}`);
+  //   const defaultStructure = {
+  //     purchasedItems: {
+  //       cold: [],
+  //       perishables: [],
+  //       cleaning: [],
+  //       others: [],
+  //     },
+  //   };
 
-    try {
-      await setDoc(userRef, defaultStructure, { merge: true });
-      console.log('Estrutura de purchasedItems restaurada com sucesso.');
-    } catch (error) {
-      console.error('Erro ao restaurar purchasedItems:', error);
-      throw error;
-    }
-  }
+  //   try {
+  //     await setDoc(userRef, defaultStructure, { merge: true });
+  //     console.log('Estrutura de purchasedItems restaurada com sucesso.');
+  //   } catch (error) {
+  //     console.error('Erro ao restaurar purchasedItems:', error);
+  //     throw error;
+  //   }
+  // }
 
-  async resetShoppingList(userId: string): Promise<void> {
-    const userRef = doc(this.firestore, `users/${userId}`);
-    const defaultStructure = {
-      shoppingList: {
-        cold: [],
-        perishables: [],
-        cleaning: [],
-        others: [],
-      },
-    };
+  // async resetShoppingList(userId: string): Promise<void> {
+  //   const userRef = doc(this.firestore, `users/${userId}`);
+  //   const defaultStructure = {
+  //     shoppingList: {
+  //       cold: [],
+  //       perishables: [],
+  //       cleaning: [],
+  //       others: [],
+  //     },
+  //   };
 
-    try {
-      await setDoc(userRef, defaultStructure, { merge: true });
-      console.log('Estrutura de shoppingList restaurada com sucesso.');
-    } catch (error) {
-      console.error('Erro ao restaurar shoppingList:', error);
-      throw error;
-    }
-  }
+  //   try {
+  //     await setDoc(userRef, defaultStructure, { merge: true });
+  //     console.log('Estrutura de shoppingList restaurada com sucesso.');
+  //   } catch (error) {
+  //     console.error('Erro ao restaurar shoppingList:', error);
+  //     throw error;
+  //   }
+  // }
 
   async addItem(userId: string, category: string, item: Iproduct): Promise<void> {
 
