@@ -1,0 +1,23 @@
+.navbar {
+    background-color: #007acc;
+  
+    .navbar-brand,
+    .nav-link {
+      color: #ffffff !important;
+  
+      &:hover {
+        color: #e6f7ff !important;
+      }
+    }
+  
+    .btn-outline-success {
+      color: #ffffff;
+      border-color: #e6f7ff;
+  
+      &:hover {
+        background-color: #e6f7ff;
+        color: #007acc;
+      }
+    }
+  }
+  
