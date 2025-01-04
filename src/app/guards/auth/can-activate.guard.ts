@@ -18,13 +18,4 @@ export const canActivateGuard: CanActivateFn = (route, state) => {
     map((isAuthenticated) => isAuthenticated) // Retorna true ou false para o guard
   );
 
-  // let isAuthenticated = false;
-  // auth.isAuthenticated$.subscribe((isAuth) => (isAuthenticated = isAuth));
-
-  // if(!isAuthenticated) {
-  //   auth.loginWithRedirect();
-  //   return false;
-  // }
-
-  // return true;
 };
