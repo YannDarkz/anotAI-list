@@ -124,7 +124,7 @@ export class AddItemsComponent {
       this.currentItemCategory = null;
       this.itemUpdated.emit();
   
-      console.log('Operação concluída com sucesso.');
+      // console.log('Operação concluída com sucesso.');
     } catch (error) {
       console.error('Erro ao adicionar/editar item:', error);
     }
@@ -140,7 +140,9 @@ export class AddItemsComponent {
   }
 
   startEdit(item: Iproduct, category: string): void {
-    this.addItemForm.patchValue(item);
+    const itemEdit = {...item, price: '' }
+    this.addItemForm.patchValue(itemEdit);
+    
     this.editing = true;
     this.currentItemId = item.id;
     this.currentItemCategory = category;
