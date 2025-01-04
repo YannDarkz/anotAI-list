@@ -1,13 +1,46 @@
 .container-home {
-    margin-top: 20vh;
     display: flex;
-    flex-direction: column;
     align-items: center;
+    justify-content: center;
+    min-height: 70vh;
+    background: linear-gradient(to bottom, #f0f8ff, #e6f7ff);
+    font-family: 'Arial', sans-serif;
 
-    h4 {
+    .content {
         text-align: center;
-        font-size: 25px;
-        text-shadow: 1px 1px 2px rgb(228, 217, 217), 0 0 1em rgb(215, 215, 224), 0 0 0.2em rgb(35, 35, 37);
-        margin-bottom: 2vh;
-     }
+        background: #ffffff;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        max-width: 400px;
+        width: 90%;
+
+        .welcome-text {
+            font-size: 24px;
+            color: #007acc;
+            margin-bottom: 10px;
+        }
+
+        .description {
+            font-size: 16px;
+            color: #555555;
+            margin-bottom: 20px;
+        }
+
+        .image-container {
+            margin: 20px 0;
+
+            img {
+                width: 100%;
+                max-width: 250px;
+                height: auto;
+            }
+        }
+
+        .container-btn {
+            display: flex;
+            justify-content: center;
+        }
+
+    }
 }
