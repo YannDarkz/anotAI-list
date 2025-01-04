@@ -14,10 +14,11 @@ export const routes: Routes = [
         
     },
     {
-        path: '',
+        path: 'login',
         component: HomeComponent,
 
     },
+    { path: '', redirectTo: '/login', pathMatch: 'full' },
     {
         path: '**',
         component: NotFoundComponent,
