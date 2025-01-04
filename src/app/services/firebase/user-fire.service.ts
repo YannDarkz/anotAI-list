@@ -8,14 +8,16 @@ import { Iproduct } from '../../interfaces/item-list';
 export interface Icategory {
     cold: Iproduct[];
     perishables: Iproduct[];
+    nonperishables: Iproduct[];
     cleaning: Iproduct[];
     others: Iproduct[];
 };
 
 const defaultCategories: Icategory = {
   cold: [],
-  cleaning: [],
   perishables: [],
+  nonperishables: [],
+  cleaning: [],
   others: []
 };
 export interface User {
