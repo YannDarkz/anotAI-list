@@ -28,6 +28,7 @@ export class BuyItemComponent {
   categoriesWithItems: Icategory = {
     cold: [],
     perishables: [],
+    nonperishables: [],
     cleaning: [],
     others: []
 
@@ -65,17 +66,6 @@ export class BuyItemComponent {
         console.error(`Erro ao carregar itens comprados da categoria ${category}:`, error);
       }
     }
-  }
-
-  resetPurchasedItems(): void {
-    if (!this.userId) {
-      console.error('User ID não definido.');
-      return;
-    }
-
-    this.shoppingService.resetPurchasedItems(this.userId)
-      .then(() => console.log('Estrutura restaurada no Firebase.'))
-      .catch(error => console.error('Erro ao restaurar estrutura:', error));
   }
 
   toggleDetails(category: string): void {
