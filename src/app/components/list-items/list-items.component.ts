@@ -41,7 +41,8 @@ export class ListItemsComponent   {
   categoriesWithItems: Icategory = {
     cold: [],
     perishables: [],
-    cleaning: [] ,
+    nonperishables: [],
+    cleaning: [],
     others: []
 
   };
@@ -207,6 +208,8 @@ calculateTotalPrice(): void {
         return 'frios';
         case 'perishables':
           return 'perecíveis';
+        case  'nonperishables'  :
+          return 'não perecíveis';
       case 'cleaning':
         return 'limpeza';
         case 'others':

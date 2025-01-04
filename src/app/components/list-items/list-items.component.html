@@ -8,9 +8,10 @@
 </div>
 
 <div class="user-profile" *ngIf="userData">
-  <img src={{userData.picture}} alt="foto-perfil">
-  <h4>User: <strong>{{userData.name}}</strong></h4>
-  <p>Email:{{userData.email}}</p>
+  <!-- <img src={{userData.picture}} alt="foto-perfil"> -->
+  <img *ngIf="userData?.picture" [src]="userData.picture" alt="User Profile">
+  <h4>Olá <strong>{{userData.name}}</strong></h4>
+  <p>Boas compras!</p>
 
 </div>
 
@@ -48,7 +49,7 @@
   </div>
 
   <ng-template #noItems>
-    <p>A lista de compras está vazia. Adicione algum item 🍇</p>
+    <p>Gategoria Vazia.<br/> Adicione Produtos 🛒 </p>
   </ng-template>
 </div>
 
