@@ -11,12 +11,12 @@ import { v4 as uuidv4 } from 'uuid';
 import { Firestore, getDoc, doc, updateDoc } from '@angular/fire/firestore';
 
 @Component({
-  selector: 'app-add-items',
-  standalone: true,
-  imports: [ReactiveFormsModule, CommonModule],
-  providers: [CurrencyPipe],
-  templateUrl: './add-items.component.html',
-  styleUrl: './add-items.component.scss'
+    selector: 'app-add-items',
+    standalone: true,
+    imports: [ReactiveFormsModule, CommonModule],
+    providers: [CurrencyPipe],
+    templateUrl: './add-items.component.html',
+    styleUrl: './add-items.component.scss'
 })
 export class AddItemsComponent {
 
