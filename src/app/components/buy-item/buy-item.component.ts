@@ -11,12 +11,12 @@ import { filter } from 'rxjs/operators';
 import { Icategory } from '../../services/firebase/user-fire.service';
 
 @Component({
-  selector: 'app-buy-item',
-  standalone: true,
-  imports: [CommonModule, CardBuyItemComponent],
-  templateUrl: './buy-item.component.html',
-  styleUrl: './buy-item.component.scss',
-  providers: [ShoppingListService]
+    selector: 'app-buy-item',
+    standalone: true,
+    imports: [CommonModule, CardBuyItemComponent],
+    templateUrl: './buy-item.component.html',
+    styleUrl: './buy-item.component.scss',
+    providers: [ShoppingListService]
 })
 export class BuyItemComponent {
   
