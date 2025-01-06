@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { CardListComponent } from '../card-list/card-list.component';
 import { AddItemsComponent } from '../add-items/add-items.component';
 import { BuyItemComponent } from '../buy-item/buy-item.component';
-import { AuthButtonsComponent } from '../auth-buttons/auth-buttons.component';
 
 import { Iproduct } from '../../interfaces/item-list';
 import { Iuser } from '../../interfaces/user';
@@ -20,11 +19,11 @@ import { UserService } from '../../services/user/user.service';
 
 
 @Component({
-  selector: 'app-list-items',
-  standalone: true,
-  imports: [CommonModule, CardListComponent, AddItemsComponent, BuyItemComponent, AuthButtonsComponent],
-  templateUrl: './list-items.component.html',
-  styleUrl: './list-items.component.scss'
+    selector: 'app-list-items',
+    standalone: true,
+    imports: [CommonModule, CardListComponent, AddItemsComponent, BuyItemComponent,],
+    templateUrl: './list-items.component.html',
+    styleUrl: './list-items.component.scss'
 })
 export class ListItemsComponent   {
 

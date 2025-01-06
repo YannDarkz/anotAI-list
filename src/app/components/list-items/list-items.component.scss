@@ -8,7 +8,6 @@
   opacity: 0;
   background-color: rgba(10, 155, 29, 0.781);
   color: rgb(3, 41, 255);
-  z-index: 5;
   position: fixed;
   width: 70%;
   top: 20px;
@@ -32,6 +31,7 @@
   }
   
   &.show {
+    z-index: 7;
       opacity: 1;
   }
 }
