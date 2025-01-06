@@ -1,9 +1,17 @@
 .navbar {
-    background-color: #007acc;
+    background-color: #add8e6 !important;
+    border-radius: 10px;
+    z-index: 6;
+
+    .logo {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+    }
   
     .navbar-brand,
     .nav-link {
-      color: #ffffff !important;
+      color: #e60b0b !important;
   
       &:hover {
         color: #e6f7ff !important;

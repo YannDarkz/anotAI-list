@@ -1,7 +1,6 @@
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
     <div class="container-fluid">
-      <a class="navbar-brand" href="#">anotAI</a>
-      <button
+        <button
         class="navbar-toggler"
         type="button"
         data-bs-toggle="collapse"
@@ -9,9 +8,11 @@
         aria-controls="navbarContent"
         aria-expanded="false"
         aria-label="Toggle navigation"
-      >
+        >
         <span class="navbar-toggler-icon"></span>
-      </button>
+    </button>
+    <h1 class="site-name">anotAI</h1>
+    <img src="/shopping_cart_icon.png" alt="Logo anotAI" class="logo" />
       <div class="collapse navbar-collapse" id="navbarContent">
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
           <li class="nav-item">
@@ -24,15 +25,8 @@
             <a class="nav-link" href="#">Sobre</a>
           </li>
         </ul>
-        <form class="d-flex">
-          <input
-            class="form-control me-2"
-            type="search"
-            placeholder="Buscar"
-            aria-label="Search"
-          />
-          <button class="btn btn-outline-success" type="submit">Buscar</button>
-        </form>
+        <app-profile></app-profile>
+        <app-auth-buttons></app-auth-buttons>
       </div>
     </div>
   </nav>
