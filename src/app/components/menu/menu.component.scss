@@ -3,19 +3,53 @@
     border-radius: 10px;
     z-index: 6;
 
+    .container-fluid{
+
+        .navbar-collapse {
+
+            ul {
+                margin-top: 4vh;
+                display: flex;
+                flex-direction: column;
+                gap: 1vh;
+                
+
+
+                li {
+                    .nav-link {
+                        font-weight: 700;
+                        display: flex;
+                        color: #165cc5 !important;
+  
+                        &:hover {
+                          color: #000000 !important;
+                        }
+                        p {
+                            margin: auto 0;
+                        }
+                
+                        svg {
+                            width: 20px;
+                            // color: rgb(170, 41, 41);
+                            margin-left: 4px;
+                        }
+                    }
+
+                }
+
+            }
+
+        }
+
+
+    }
+
+  
+
     .logo {
         width: 40px;
         height: 40px;
         border-radius: 10px;
-    }
-  
-    .navbar-brand,
-    .nav-link {
-      color: #e60b0b !important;
-  
-      &:hover {
-        color: #e6f7ff !important;
-      }
     }
   
     .btn-outline-success {
