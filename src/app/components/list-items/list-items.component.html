@@ -15,7 +15,17 @@
   <div *ngFor="let category of categoriesWithItems | keyvalue">
     <details [open]="openCategory === category.key">
       <summary (click)="toggleDetails(category.key)">
-        {{ categoriaPT(category.key) | uppercase }}
+        <i 
+        [ngClass]="{
+          'bi bi-snow': category.key === 'cold',
+          'bi bi-apple': category.key === 'perishables',
+          'bi bi-box': category.key === 'nonperishables',
+          'bi bi-stars': category.key === 'cleaning',
+          'bi bi-basket': category.key === 'others'
+        }"
+        class="me-2 icon">
+      </i>
+        {{ categoriaPT(category.key) | uppercase }} ({{ category.value.length }})
       </summary>
       <ul *ngIf="category.value.length > 0; else noItems">
         <li *ngFor="let item of category.value; let i = index">
