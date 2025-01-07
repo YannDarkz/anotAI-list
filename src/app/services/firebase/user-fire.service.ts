@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { ChangeDetectorRef, Injectable, NgZone } from '@angular/core';
 import { Firestore, collection, doc, setDoc, getDoc, updateDoc } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
 import { Iproduct } from '../../interfaces/item-list';
@@ -32,31 +32,31 @@ export interface User {
   providedIn: 'root'
 })
 
-
-
 export class UserFireService {
 
-  constructor(private firestore: Firestore) { }
+  constructor(private firestore: Firestore,  private ngZone: NgZone) { }
 
    /**
    * Salva ou atualiza o usuário no Firestore.
    * Adiciona as listas de compras e comprados se não existirem.
    */
    async saveUser(user: User): Promise<void> {
-    const userRef = doc(this.firestore, `users/${user.userId}`);
-    const userDoc = await getDoc(userRef);
+    this.ngZone.run(async () => {
+      const userRef = doc(this.firestore, `users/${user.userId}`);
+      const userDoc = await getDoc(userRef);
 
-    if (userDoc.exists()) {
-      // Atualiza somente os campos necessários sem sobrescrever
-      await updateDoc(userRef, { ...user });
-    } else {
-      // Cria o documento inicial com listas vazias
-      await setDoc(userRef, {
-        ...user,
-        shoppingList: defaultCategories,
-        purchasedItems: defaultCategories
-      });
-    }
+      if (userDoc.exists()) {
+        await updateDoc(userRef, { ...user });
+      } else {
+        await setDoc(userRef, {
+          ...user,
+          shoppingList: defaultCategories,
+          purchasedItems: defaultCategories
+        });
+      }
+
+      // this.cdRef.detectChanges();
+    });
   }
 
   /**
@@ -68,16 +68,4 @@ export class UserFireService {
 
     return userDoc.exists() ? (userDoc.data() as User) : null;
   }
-
-
-  // async saveUser(user: any): Promise<void> {
-  //   const userRef = doc(this.firestore, `users/${user.userId}`);
-  //   await setDoc(userRef, user);
-  // }
-
-  // async getUser(userId: string): Promise<any> {
-  //   const userRef = doc(this.firestore, `users/${userId}`);
-  //   const userDoc = await getDoc(userRef);
-  //   return userDoc.exists() ? userDoc.data() : null;
-  // }
 }
