@@ -19,7 +19,7 @@ export class ProfileComponent {
 
     this.userDataService.getUserData().subscribe( data => {
       this.userData = data
-      console.log("profileData", data);
+      // console.log("profileData", data);
       
     })
 
