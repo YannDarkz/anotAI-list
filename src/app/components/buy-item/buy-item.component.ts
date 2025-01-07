@@ -124,6 +124,23 @@ export class BuyItemComponent {
       });
   }
 
+  categoriaPT(category: string): string {
+    switch (category) {
+      case 'cold':
+        return 'frios';
+      case 'perishables':
+        return 'perecíveis';
+      case 'nonperishables':
+        return 'não perecíveis';
+      case 'cleaning':
+        return 'limpeza';
+      case 'others':
+        return 'outros';
+      default:
+        return category
+    }
+  }
+
 }
 
 
