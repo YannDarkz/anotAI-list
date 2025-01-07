@@ -13,8 +13,5 @@ import * as bootstrap from 'bootstrap';
 })
 export class MenuComponent {
 
-    ngAfterViewInit(): void {
-        console.log('Bootstrap carregado:', bootstrap);
-      }
 
 }
