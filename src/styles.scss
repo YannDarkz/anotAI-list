@@ -2,14 +2,12 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-
     scroll-behavior: smooth;
 }
 
 body {
     display: flex;
     flex-direction: column;
-    // align-items: center;
 
     padding: 20px 40px 10px 40px;
     background-color: azure;
