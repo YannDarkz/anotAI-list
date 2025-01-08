@@ -5,7 +5,10 @@
             <span class="navbar-toggler-icon"></span>
         </button>
         <h1 class="site-name">anotAI</h1>
-        <img src="/shopping_cart_icon.png" alt="Logo anotAI" class="logo" />
+        <img *ngIf="userData?.picture; else fallback" [src]="userData?.picture" alt="User Profile" class="logo" />
+        <ng-template #fallback>
+            <img src="/shopping_cart_icon.png" alt="Default Icon" class="logo" />
+        </ng-template>
 
         <div class="collapse navbar-collapse" id="navbarContent">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
@@ -39,12 +42,14 @@
                 <li class="nav-item">
                     <button class="nav-link" data-bs-toggle="modal" data-bs-target="#feedbackModal">
                         <p>Feedback</p>
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
-                          </svg>
-                      </button>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                            stroke="currentColor" class="size-6">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
+                        </svg>
+                    </button>
 
-                      
+
 
                 </li>
             </ul>
@@ -56,31 +61,33 @@
 </nav>
 
 <!-- Modal -->
-<div class="modal fade" id="feedbackModal" #feedbackModal tabindex="-1" aria-labelledby="feedbackModalLabel" aria-hidden="true">
+<div class="modal fade" id="feedbackModal" #feedbackModal tabindex="-1" aria-labelledby="feedbackModalLabel"
+    aria-hidden="true">
     <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="feedbackModalLabel">Enviar Feedback</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <form>
-            <div class="mb-3">
-              <label for="feedbackTitle" class="form-label">Título</label>
-              <input type="text" id="feedbackTitle" class="form-control" [(ngModel)]="feedback.title" name="title" required>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="feedbackModalLabel">Enviar Feedback</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="mb-3">
-              <label for="feedbackDescription" class="form-label">Descrição</label>
-              <textarea id="feedbackDescription" class="form-control" [(ngModel)]="feedback.description" name="description" rows="4" required></textarea>
+            <div class="modal-body">
+                <form>
+                    <div class="mb-3">
+                        <label for="feedbackTitle" class="form-label">Título</label>
+                        <input type="text" id="feedbackTitle" class="form-control" [(ngModel)]="feedback.title"
+                            name="title" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="feedbackDescription" class="form-label">Descrição</label>
+                        <textarea id="feedbackDescription" class="form-control" [(ngModel)]="feedback.description"
+                            name="description" rows="4" required></textarea>
+                    </div>
+                </form>
             </div>
-          </form>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal"
+                    (click)="sendFeedback()">Enviar</button>
+            </div>
         </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-          <button type="button" class="btn btn-primary" data-bs-dismiss="modal" (click)="sendFeedback()">Enviar</button>
-        </div>
-      </div>
     </div>
-  </div>
-
-
+</div>
