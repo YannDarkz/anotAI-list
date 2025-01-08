@@ -10,8 +10,8 @@ import { Iuser } from '../../interfaces/user';
   providedIn: 'root'
 })
 export class UserDataService {
-  private userData = new BehaviorSubject<Iuser | null>(null);  // Armazena o estado dos dados do usuário
-  userData$ = this.userData.asObservable();  // Exposição dos dados como um Observable
+  private userData = new BehaviorSubject<Iuser | null>(null);  
+  userData$ = this.userData.asObservable();  
 
   constructor(private authService: AuthService, private http: HttpClient) {}
 
