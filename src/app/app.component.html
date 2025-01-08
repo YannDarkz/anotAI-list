@@ -4,4 +4,8 @@
 <div class="container-outlet">
     <router-outlet></router-outlet>
 </div>
+<button id="scrollToTopBtn" class="btn btn-primary rounded-circle" title="Voltar ao topo" [class.show]="showScrollToTop"
+(click)="scrollToTop()">
+<i class="bi bi-arrow-up"></i> 
+  </button>
 <app-footer></app-footer>
