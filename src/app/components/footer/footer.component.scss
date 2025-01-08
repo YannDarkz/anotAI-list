@@ -46,9 +46,11 @@
             a {
               color: #ffffff;
               text-decoration: none;
+              transition: 0.3s ease-in-out;
   
               &:hover {
-                text-decoration: underline;
+                text-decoration: none;
+                color: rgb(38, 172, 172);
               }
             }
           }
@@ -69,6 +71,12 @@
   
         p {
           font-size: 10px;
+
+          .dev_name {
+            color: rgb(38, 172, 172);
+            text-decoration: none;
+
+          }
         }
       }
     }

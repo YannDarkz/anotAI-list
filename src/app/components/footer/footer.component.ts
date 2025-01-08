@@ -9,4 +9,9 @@ import { Component } from '@angular/core';
 })
 export class FooterComponent {
 
+     generateWhatsAppLink = (phoneNumber: string, message: string): string => {
+        const encodeMessage = encodeURIComponent(message)
+        return `https://wa.me/${phoneNumber}?text=${encodeMessage}`
+    }
+
 }
