@@ -9,7 +9,8 @@ button {
     cursor: pointer;
     font-size: 10px;
     line-height: 2rem;
-    width: 25vw;
+    min-width: 100px;
+    max-width: 600px;
     letter-spacing: 0.3rem;
     font-weight: 600;
     position: relative;
@@ -31,6 +32,7 @@ button:hover {
 .container-btn-logout {
     // padding: 5px;
     // border: 1px solid;
+   
     margin: 0;
     width: 70px;
     display: flex;
@@ -38,6 +40,8 @@ button:hover {
     align-items: center;
 
     .btn-logout {
+        max-width: none;
+        min-width: 0;
         display: flex;
         justify-content: center;
         align-items: center;
