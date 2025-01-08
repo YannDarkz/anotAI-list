@@ -133,7 +133,7 @@ export class ListItemsComponent {
           console.error(`Categoria ${category} não existe localmente.`);
         }
 
-        // Exibe uma notificação ao usuário
+        this.loadItems();
         this.notifyRemoveItem();
       } catch (error) {
         console.error('Erro ao deletar item:', error);
