@@ -279,6 +279,13 @@ export class ListItemsComponent {
     }, 1000)
   }
 
+  notifyRevertItem(): void {
+    this.addTextNotify = 'Removido do Carrinho! ✅'
+    setTimeout(() => {
+      this.addTextNotify = ''
+    }, 1000)
+  }
+
   notifyAddBuyItem(): void {
     this.addTextNotify = 'adcionado No carrinho! ✅'
     setTimeout(() => {
