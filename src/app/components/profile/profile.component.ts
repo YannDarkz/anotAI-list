@@ -11,9 +11,9 @@ import { CommonModule } from '@angular/common';
   styleUrl: './profile.component.scss'
 })
 export class ProfileComponent {
+  constructor( private userDataService: UserDataService) {}
    userData: Iuser | null = null
 
-  constructor( private userDataService: UserDataService) {}
 
   ngOnInit(): void {
 
