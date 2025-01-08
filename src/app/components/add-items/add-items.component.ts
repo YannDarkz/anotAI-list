@@ -155,6 +155,18 @@ export class AddItemsComponent {
     this.currentItemCategory = null;
   }
 
+  increment(): void {
+    const currentQuantity = this.addItemForm.get('quantity')?.value || 0;
+    this.addItemForm.get('quantity')?.setValue(currentQuantity + 1);
+}
+
+decrement(): void {
+    const currentQuantity = this.addItemForm.get('quantity')?.value || 0;
+    if (currentQuantity > 1) { // Para garantir que a quantidade não fique abaixo de 1
+        this.addItemForm.get('quantity')?.setValue(currentQuantity - 1);
+    }
+}
+
   get itemName() {
     return this.addItemForm.get('name')!;
   }

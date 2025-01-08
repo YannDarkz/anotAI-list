@@ -17,19 +17,20 @@
 
         <div class="form-group">
             <label for="itemPrice">Preço do Item: </label>
-            <input  (input)="onPriceInput($event)" class="input price" id="itemPrice" type="text" formControlName="price" placeholder="R$ 0,00"
-                [class.invalid]="itemPrice.invalid && (itemPrice.dirty || itemPrice.touched)"
+            <input (input)="onPriceInput($event)" class="input price" id="itemPrice" type="text" formControlName="price"
+                placeholder="R$ 0,00" [class.invalid]="itemPrice.invalid && (itemPrice.dirty || itemPrice.touched)"
                 aria-describedby="itemPriceError" />
-                
-                <div *ngIf="itemPrice.invalid && (itemPrice.dirty || itemPrice.touched)" id="itemPriceError">
-                    <small *ngIf="itemPrice.errors?.['required']">Preço obrigatório  </small>
-                </div>
-                <strong>Caso não saiba, Digite ' 0 '</strong>
+
+            <div *ngIf="itemPrice.invalid && (itemPrice.dirty || itemPrice.touched)" id="itemPriceError">
+                <small *ngIf="itemPrice.errors?.['required']">Preço obrigatório </small>
+            </div>
+            <strong>Caso não saiba, Digite ' 0 '</strong>
         </div>
 
         <div>
             <label for="category">Categoria:</label>
-            <select formControlName="category" [class.invalid]="itemCategory.invalid && (itemCategory.touched || itemCategory.dirty)" id="category" >
+            <select formControlName="category"
+                [class.invalid]="itemCategory.invalid && (itemCategory.touched || itemCategory.dirty)" id="category">
                 <option value="">Selecione</option>
                 <option value="cold">Frios</option>
                 <option value="cleaning">Limpeza</option>
@@ -37,18 +38,21 @@
                 <option value="nonPerishables">não-perecíveis</option>
                 <option value="others">outros</option>
             </select>
-            
+
             <div *ngIf="itemCategory.invalid && (itemCategory.touched || itemCategory.touched)">
-                <small *ngIf="itemCategory.errors?.['required']">categoria é obrigatória.  </small>
+                <small *ngIf="itemCategory.errors?.['required']">categoria é obrigatória. </small>
             </div>
         </div>
 
         <div class="form-group">
             <label for="itemQuantity">Quantidade do Item: </label>
-            <input class="input qtd" id="itemQuantity" type="number" formControlName="quantity" placeholder="Digite a quantidade"
-                   [class.invalid]="itemQuantity.invalid && (itemQuantity.dirty || itemQuantity.touched)"
-                   aria-describedby="itemQuantityError" />
-        
+            <button class="btn btn-outline-secondary decrement" type="button" (click)="decrement()"> <i class="bi bi-dash"></i></button>
+            <input class="input qtd" id="itemQuantity" type="number" formControlName="quantity"
+                placeholder="Digite a quantidade"
+                [class.invalid]="itemQuantity.invalid && (itemQuantity.dirty || itemQuantity.touched)"
+                aria-describedby="itemQuantityError" />
+            <button class="btn btn-outline-secondary" type="button" (click)="increment()"> <i class="bi bi-plus"></i></button>
+
             <div *ngIf="itemQuantity.invalid && (itemQuantity.dirty || itemQuantity.touched)" id="itemQuantityError">
                 <small *ngIf="itemQuantity.errors?.['required']">Quantidade é obrigatória!</small>
                 <small *ngIf="itemQuantity.errors?.['min']">A quantidade deve ser pelo menos 1!</small>
