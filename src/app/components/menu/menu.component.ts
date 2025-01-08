@@ -19,23 +19,25 @@ import { Iuser } from '../../interfaces/user';
 })
 export class MenuComponent {
 
-    
+    addTextNotify: string = ''
 
-    constructor(private userDataService: UserDataService, private viewportScroller: ViewportScroller) {}
-     userData: Iuser | null = null
-    
-    
-      ngOnInit(): void {
-    
-        this.userDataService.getUserData().subscribe( data => {
-          this.userData = data
+
+
+    constructor(private userDataService: UserDataService, private viewportScroller: ViewportScroller) { }
+    userData: Iuser | null = null
+
+
+    ngOnInit(): void {
+
+        this.userDataService.getUserData().subscribe(data => {
+            this.userData = data
         })
-    
-    
-      }
+
+
+    }
 
     scrollToElement(elementId: string): void {
-      this.viewportScroller.scrollToAnchor(elementId);
+        this.viewportScroller.scrollToAnchor(elementId);
     }
 
     @ViewChild('feedbackModal') feedbackModal!: ElementRef;
@@ -43,43 +45,42 @@ export class MenuComponent {
     feedback = {
         title: '',
         description: ''
-      };
-    
-      sendFeedback() {
+    };
+
+    sendFeedback() {
         // Verifica se os campos estão preenchidos
         if (!this.feedback.title || !this.feedback.description) {
-          alert('Por favor, preencha todos os campos antes de enviar.');
-          return;
+            alert('Por favor, preencha todos os campos antes de enviar.');
+            return;
         }
-    
+
         // Prepara o objeto de feedback
         const feedbackData = {
-          ...this.feedback,
-          timestamp: new Date().toISOString() // Adiciona a data e hora do envio
+            ...this.feedback,
+            timestamp: new Date().toISOString() // Adiciona a data e hora do envio
         };
-    
+        this.notifyFeedeback()
         console.log('Feedback pronto para envio:', feedbackData);
-    
-        // Aqui você pode implementar a lógica para enviar o feedback ao banco de dados
-        // Por exemplo, usando um serviço Angular para fazer a requisição HTTP
-        // this.feedbackService.sendFeedback(feedbackData).subscribe(() => {
-        //   alert('Feedback enviado com sucesso!');
-        //   this.resetFeedback();
-        // });
-    
-        // Por enquanto, apenas limpa o formulário
-        this.resetFeedback();
-        this.closeModal();
-      }
-    
-      resetFeedback() {
-        this.feedback = {
-          title: '',
-          description: ''
-        };
-      }
 
-      closeModal() {
+        this.resetFeedback();
+
+    }
+
+    resetFeedback() {
+        this.feedback = {
+            title: '',
+            description: ''
+        };
+    }
+
+    notifyFeedeback(): void {
+        this.addTextNotify = 'Feedback enviado! ✅'
+        setTimeout(() => {
+            this.addTextNotify = ''
+        }, 1500)
+    }
+
+    closeModal() {
         const modalElement = this.feedbackModal.nativeElement;
         // const modalInstance = Modal.getInstance(modalElement);
         // if (modalInstance) {
@@ -91,7 +92,7 @@ export class MenuComponent {
         // if (overlay) {
         //   overlay.remove();
         // }
-      }
+    }
 
 
 }

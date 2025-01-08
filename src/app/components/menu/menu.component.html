@@ -1,3 +1,7 @@
+<div class="notification-card" [ngClass]="{'show': addTextNotify, 'none': !addTextNotify}">
+    <h3 class="text-notify">{{addTextNotify}}</h3>
+  </div>
+  
 <nav class="navbar navbar-light">
     <div class="container-fluid">
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent"
