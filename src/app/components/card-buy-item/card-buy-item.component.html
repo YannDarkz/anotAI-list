@@ -1,6 +1,4 @@
 <div class="card">
-
-
         <h3>✅ {{ name | uppercase }} ✅</h3>
 
         <button (click)="onRemove()" class="delete">
@@ -10,8 +8,7 @@
             </svg>
         </button>
     
-    <h5>Preço: {{ price }} </h5>
-    <h5>x: {{ quantity }}</h5>
-
-    <!-- <p><strong>Preço:</strong> {{ price | currency: 'BRL' }}</p> -->
+    <h5>Preço: <strong>und</strong>{{ price | currency: 'BRL' }} </h5>
+    <h6>X: {{ quantity }}</h6>
+    <h6 class="total">Total: {{ total | currency: 'BRL' }}</h6>
 </div>

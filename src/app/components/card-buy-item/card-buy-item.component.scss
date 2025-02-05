@@ -9,8 +9,8 @@
 
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 
-  
-    
+
+
 }
 
 
@@ -22,12 +22,29 @@ h3 {
     padding-bottom: 1vh;
     border-bottom: 1px dashed black;
     margin-bottom: 1vh;
-    
+
 }
 
-p {
-    margin: 5px 0 0;
-    color: #333;
+
+h5 {
+    position: relative;
+
+    strong {
+        font-size: 10px;
+        letter-spacing: 1px;
+        position: relative;
+        right: 10px;
+        bottom: 15px;
+
+
+    }
+}
+
+.total {
+    margin-top: 1vh;
+    text-align: center;
+    background-color: #27e900;
+    box-shadow: 3px 3px #5baf4a, -0.5em 0px .5em rgb(61, 136, 4);
 }
 
 button {
