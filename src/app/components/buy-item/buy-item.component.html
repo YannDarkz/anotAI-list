@@ -29,6 +29,7 @@
             [name]="item.name"
             [price]="item.price"
             [quantity]="item.quantity"
+            [total]="item.quantity * convertFormattedPriceToNumber(item.price)"
             (remove)="removeFromPurchasedItems(category.key, i)">
           </app-card-buy-item>
         </li>
