@@ -13,6 +13,7 @@ export class CardBuyItemComponent {
   @Input() name!: string;
   @Input() price!: string;
   @Input() quantity!: number;
+  @Input() total!: number | string;
   
 
   @Output() remove = new EventEmitter<void>()
