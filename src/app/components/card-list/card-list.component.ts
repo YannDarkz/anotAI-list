@@ -18,24 +18,16 @@ export class CardListComponent {
   @Output() delete = new EventEmitter<void>();
   @Output() buy = new EventEmitter<void>()
 
-  // numberPrice(): void {
-  //   this.price = this.price.replace(/\D/g, "");
-  // }
-
 onEdit() {
   this.edit.emit();
-
-  
 }
 
 onDelete() {
-  this.delete.emit();
-  
+  this.delete.emit(); 
 }
 
 onBuy() {
   this.buy.emit();
 }
-
 
 }

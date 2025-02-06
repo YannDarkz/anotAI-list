@@ -9,7 +9,6 @@ import { UserDataService } from '../../services/user-data/user-data.service';
 
 import { filter } from 'rxjs/operators';
 import { Icategory } from '../../services/firebase/user-fire.service';
-
 @Component({
     selector: 'app-buy-item',
     standalone: true,
@@ -75,7 +74,6 @@ export class BuyItemComponent {
       this.openCategory = category;
     }
   }
-
 
   calculateTotalPrice(): void {
     this.buyPrice = Object.values(this.categoriesWithItems).reduce((acc, products) => {
