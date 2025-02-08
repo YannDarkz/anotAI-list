@@ -5,7 +5,6 @@
   border: 1px solid #ccc;
   border-radius: 8px;
   background-color: #f9f9f9;
-
 }
 
 h4 {
@@ -38,7 +37,6 @@ input,
 select {
   border: none;
   border-bottom: 2px solid #3498db;
-  /* Linha cinza inicial */
   outline: none;
   width: 100%;
   font-size: 16px;
@@ -65,7 +63,6 @@ input[placeholder] {
   font-size: 12px;
 }
 
-
 .input.qtd {
   width: 15%;
   text-align: center;
@@ -76,8 +73,6 @@ input[placeholder] {
     -webkit-appearance: none;
   }
 }
-
-
 
 small {
   font-size: 10px;
@@ -124,7 +119,6 @@ button:disabled {
     &:hover {
       background-color: #8f2a36;
     }
-
   }
 }
 
@@ -133,7 +127,6 @@ button:disabled {
   display: flex;
   flex-direction: column;
   gap: 2vh;
-
 
   button.cancel {
     background-color: #dc3545;
