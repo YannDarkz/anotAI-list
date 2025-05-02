@@ -24,7 +24,7 @@ export class HomeComponent {
       if (userId) {
         setTimeout(() => {
           this.router.navigate(['/listItems']);
-        }, 2000);
+        }, 1000);
       }
     });
   }
