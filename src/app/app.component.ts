@@ -30,17 +30,13 @@ export class AppComponent implements OnInit {
   onScroll() {
     const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
     const scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-    this.showScrollToTop = scrollTop / scrollHeight > 0.2; // Exibir se rolou 20%
-    console.log(this.showScrollToTop);
+    this.showScrollToTop = scrollTop / scrollHeight > 0.2; 
     
   }
 
-  // Voltar ao topo
   scrollToTop() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
-
-
   showError(message: string) {
     alert(message); 
   }
