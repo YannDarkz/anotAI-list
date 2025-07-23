@@ -2,7 +2,6 @@
   "name": "lista-de-compras-angular",
   "version": "0.0.0",
   "scripts": {
-    "api": "json-server --watch db.json --port 3000",
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
