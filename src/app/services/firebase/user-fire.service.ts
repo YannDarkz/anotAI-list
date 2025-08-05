@@ -1,16 +1,18 @@
-import { ChangeDetectorRef, Injectable, NgZone } from '@angular/core';
-import { Firestore, collection, doc, setDoc, getDoc, updateDoc } from '@angular/fire/firestore';
-import { Observable } from 'rxjs';
+import { Injectable, NgZone, inject } from '@angular/core';
+import { ɵAngularFireSchedulers } from '@angular/fire';
+import { Firestore, doc, setDoc, getDoc, updateDoc, DocumentReference, DocumentSnapshot } from '@angular/fire/firestore';
+import { Observable, from } from 'rxjs';
 import { Iproduct } from '../../interfaces/item-list';
 
 
 
+
 export interface Icategory {
-    cold: Iproduct[];
-    perishables: Iproduct[];
-    nonperishables: Iproduct[];
-    cleaning: Iproduct[];
-    others: Iproduct[];
+  cold: Iproduct[];
+  perishables: Iproduct[];
+  nonperishables: Iproduct[];
+  cleaning: Iproduct[];
+  others: Iproduct[];
 };
 
 const defaultCategories: Icategory = {
@@ -33,39 +35,63 @@ export interface User {
 })
 
 export class UserFireService {
+  private firestore = inject(Firestore);
+  private ngZone = inject(NgZone);
+  private schedulers = inject(ɵAngularFireSchedulers);
 
-  constructor(private firestore: Firestore,  private ngZone: NgZone) { }
+  private getDocInZone<T>(ref: DocumentReference<T>): Promise<DocumentSnapshot<T>> {
+    return this.ngZone.run(() => getDoc(ref));
+  }
 
-   /**
-   * Salva ou atualiza o usuário no Firestore.
-   * Adiciona as listas de compras e comprados se não existirem.
-   */
-   async saveUser(user: User): Promise<void> {
-    this.ngZone.run(async () => {
-      const userRef = doc(this.firestore, `users/${user.userId}`);
-      const userDoc = await getDoc(userRef);
+  private setDocInZone<T>(ref: DocumentReference<T>, data: T): Promise<void> {
+    return this.ngZone.run(() => setDoc(ref, data));
+  }
 
-      if (userDoc.exists()) {
-        await updateDoc(userRef, { ...user });
-      } else {
-        await setDoc(userRef, {
-          ...user,
-          shoppingList: defaultCategories,
-          purchasedItems: defaultCategories
+  private updateDocInZone<T>(ref: DocumentReference<T>, data: Partial<T>): Promise<void> {
+    return this.ngZone.run(() => updateDoc(ref, data));
+  }
+
+  async saveUser(user: User): Promise<void> {
+    try {
+      this.schedulers.insideAngular.schedule(() => {
+        this.ngZone.run(async () => {
+          const userRef = doc(this.firestore, `users/${user.userId}`);
+          const userDoc = await this.getDocInZone(userRef);
+
+          if (userDoc.exists()) {
+            await this.updateDocInZone(userRef, { ...user });
+          } else {
+            await setDoc(userRef, {
+              ...user,
+              shoppingList: defaultCategories,
+              purchasedItems: defaultCategories
+            });
+          }
         });
-      }
-
-      // this.cdRef.detectChanges();
-    });
+      });
+    } catch (error) {
+      console.error('Error saving user:', error);
+      throw error;
+    }
   }
 
   /**
    * Obtém os dados do usuário pelo ID.
    */
-  async getUser(userId: string): Promise<User | null> {
-    const userRef = doc(this.firestore, `users/${userId}`);
-    const userDoc = await getDoc(userRef);
+  getUser(userId: string): Observable<User | null> {
+    return from(this.getUserData(userId));
+  }
 
-    return userDoc.exists() ? (userDoc.data() as User) : null;
+  private async getUserData(userId: string): Promise<User | null> {
+    try {
+      return await this.ngZone.run(async () => {
+        const userRef = doc(this.firestore, `users/${userId}`);
+        const userDoc = await getDoc(userRef);
+        return userDoc.exists() ? (userDoc.data() as User) : null;
+      });
+    } catch (error) {
+      console.error('Error getting user:', error);
+      throw error;
+    }
   }
 }
