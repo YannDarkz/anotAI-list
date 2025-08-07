@@ -1,9 +1,11 @@
-import { Injectable } from '@angular/core';
 
-
+import { Injectable, NgZone, inject } from '@angular/core';
+import { ɵAngularFireSchedulers, ɵzoneWrap } from '@angular/fire';
+import { getDoc as getDocOriginal } from 'firebase/firestore';
 import { Iproduct } from '../../interfaces/item-list';
 import { Firestore, doc, collection, query, where, setDoc, updateDoc, getDoc, getDocs, arrayUnion, arrayRemove } from '@angular/fire/firestore';
 import { Icategory } from '../firebase/user-fire.service';
+
 
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
@@ -14,47 +16,11 @@ import { catchError } from 'rxjs/operators';
 })
 export class ShoppingListService {
 
-  constructor(private firestore: Firestore) { }
+  private firestore = inject(Firestore);
+  private ngZone = inject(NgZone);
+   private schedulers = inject(ɵAngularFireSchedulers);
+  //  private  getDoc = inject(getDoc);
 
-  // async resetPurchasedItems(userId: string): Promise<void> {
-  //   const userRef = doc(this.firestore, `users/${userId}`);
-  //   const defaultStructure = {
-  //     purchasedItems: {
-  //       cold: [],
-  //       perishables: [],
-  //       cleaning: [],
-  //       others: [],
-  //     },
-  //   };
-
-  //   try {
-  //     await setDoc(userRef, defaultStructure, { merge: true });
-  //     console.log('Estrutura de purchasedItems restaurada com sucesso.');
-  //   } catch (error) {
-  //     console.error('Erro ao restaurar purchasedItems:', error);
-  //     throw error;
-  //   }
-  // }
-
-  // async resetShoppingList(userId: string): Promise<void> {
-  //   const userRef = doc(this.firestore, `users/${userId}`);
-  //   const defaultStructure = {
-  //     shoppingList: {
-  //       cold: [],
-  //       perishables: [],
-  //       cleaning: [],
-  //       others: [],
-  //     },
-  //   };
-
-  //   try {
-  //     await setDoc(userRef, defaultStructure, { merge: true });
-  //     console.log('Estrutura de shoppingList restaurada com sucesso.');
-  //   } catch (error) {
-  //     console.error('Erro ao restaurar shoppingList:', error);
-  //     throw error;
-  //   }
-  // }
 
   async addItem(userId: string, category: string, item: Iproduct): Promise<void> {
 
@@ -65,7 +31,7 @@ export class ShoppingListService {
       const userData = userDoc.data();
       const updatedShoppingLists = userData['shoppingLists']?.map((list: any) => {
         if (list.category === category) {
-          console.log('dados run');
+          // console.log('dados run');
 
           return { ...list, products: [...list.products, item] };
         }
@@ -174,45 +140,43 @@ export class ShoppingListService {
     }
   }
 
-
-
   async getPurchasedItems(userId: string | undefined, category: keyof Icategory): Promise<Iproduct[]> {
+
     try {
-      // Acessa o documento do usuário
-      const userRef = doc(this.firestore, `users/${userId}`);
-      const userDoc = await getDoc(userRef);
-  
-      if (userDoc.exists()) {
+      return await this.ngZone.run(async () => {
+        const userRef = doc(this.firestore, `users/${userId}`);
+        const userDoc = await getDoc(userRef);
+
+        if (!userDoc.exists()) {
+          throw new Error('Usuário não encontrado.');
+        }
+
         const userData = userDoc.data();
-        // console.log('Dados do usuário:', userData);
-  
-        // Verifica se purchasedItems é um objeto
-        if (typeof userData['purchasedItems'] !== 'object' || userData['purchasedItems'] === null) {
-          console.warn('purchasedItems não é um objeto válido:', userData['purchasedItems']);
+
+        const purchasedItems = userData['purchasedItems'];
+        if (typeof purchasedItems !== 'object' || purchasedItems === null) {
+          console.warn('purchasedItems não é um objeto válido:', purchasedItems);
           return [];
         }
-  
-        // Verifica se a categoria existe
-        if (!(category in userData['purchasedItems'])) {
+
+        if (!(category in purchasedItems)) {
           console.warn(`Categoria "${category}" não encontrada em purchasedItems.`);
           return [];
         }
-  
-        // Acessa diretamente os itens da categoria
-        const categoryItems = userData['purchasedItems'][category];
+
+        const categoryItems = purchasedItems[category];
         if (Array.isArray(categoryItems)) {
           return categoryItems as Iproduct[];
         } else {
           console.warn(`A categoria ${category} não contém uma lista válida de produtos.`);
           return [];
         }
-      } else {
-        throw new Error('Usuário não encontrado.');
-      }
+      });
     } catch (error) {
       console.error('Erro ao obter itens comprados:', error);
       throw error;
     }
+
   }
 
   async removeFromPurchased(userId: string, item: Iproduct, category: string): Promise<void> {
@@ -228,8 +192,4 @@ export class ShoppingListService {
       [`shoppingList.${category}`]: arrayUnion(item)
     })
   }
-
-
-
-
 }
