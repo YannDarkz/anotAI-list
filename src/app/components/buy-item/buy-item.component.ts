@@ -21,6 +21,7 @@ export class BuyItemComponent {
   
   userId: string | undefined = undefined;
   @Output() itemUpdated = new EventEmitter<void>()
+  @Output() itemsUpdated = new EventEmitter<void>()
 
   constructor(private shoppingService: ShoppingListService, private userData: UserDataService, private itemUpdateService: ItemUpdateService) { }
 
@@ -38,7 +39,7 @@ export class BuyItemComponent {
   buyPrice: number = 0
 
   @Output() itemRemoved = new EventEmitter<void>();
-  @Output() removeItemBuy = new EventEmitter<void>()
+  // @Output() removeItemBuy = new EventEmitter<void>()
 
   async ngOnInit(): Promise<void> {
     this.userData
@@ -121,6 +122,36 @@ export class BuyItemComponent {
         console.error('Erro ao mover o item:', error);
       });
   }
+
+  returnAllItemsToShoppingList(category: keyof Icategory): void {
+  if (!this.userId) {
+    console.error('User ID não encontrado.');
+    return;
+  }
+
+  const categoryItems = this.categoriesWithItems[category];
+  if (!categoryItems || categoryItems.length === 0) {
+    console.warn(`Nenhum item encontrado na categoria "${category}".`);
+    return;
+  }
+
+  const promises = categoryItems.map(item => {
+    return this.shoppingService
+      .removeFromPurchased(this.userId!, item, category)
+      .then(() => this.shoppingService.addToShoppingList(this.userId!, item, category));
+  });
+
+  Promise.all(promises)
+    .then(() => {
+      this.categoriesWithItems[category] = []; // Limpa a lista local
+      this.calculateTotalPrice();
+      this.itemsUpdated.emit();
+      // console.log(`Todos os itens da categoria "${category}" foram movidos para a lista de compras.`);
+    })
+    .catch(error => {
+      console.error('Erro ao mover os itens:', error);
+    });
+}
 
   categoriaPT(category: string): string {
     switch (category) {
