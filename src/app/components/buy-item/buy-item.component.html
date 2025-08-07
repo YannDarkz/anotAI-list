@@ -5,30 +5,30 @@
   <ng-container *ngFor="let category of categoriesWithItems | keyvalue">
     <details [open]="openCategory === category.key">
       <summary (click)="toggleDetails(category.key)">
-        <i 
-        [ngClass]="{
+        <i [ngClass]="{
           'bi bi-snow': category.key === 'cold',
           'bi bi-apple': category.key === 'perishables',
           'bi bi-box': category.key === 'nonperishables',
           'bi bi-stars': category.key === 'cleaning',
           'bi bi-basket': category.key === 'others'
-        }"
-        class="me-2 icon">
-      </i>
+        }" class="me-2 icon">
+        </i>
         {{ categoriaPT(category.key) | uppercase }}
+        <div *ngIf="category.value.length > 1" class="container-btn-return-all">
+          <button class="btn-return-all" (click)="returnAllItemsToShoppingList(category.key)">
+            <i class="bi bi-arrow-counterclockwise me-1"></i>
+          </button>
+        </div>
 
         <div class="cart-icon-container">
           <i class="bi bi-cart"></i>
-          <span class="cart-badge" >{{ category.value.length }}</span>
+          <span class="cart-badge">{{ category.value.length }}</span>
         </div>
 
       </summary>
       <ul *ngIf="category.value.length > 0; else noItems">
         <li *ngFor="let item of category.value; let i = index">
-          <app-card-buy-item
-            [name]="item.name"
-            [price]="item.price"
-            [quantity]="item.quantity"
+          <app-card-buy-item [name]="item.name" [price]="item.price" [quantity]="item.quantity"
             [total]="item.quantity * convertFormattedPriceToNumber(item.price)"
             (remove)="removeFromPurchasedItems(category.key, i)">
           </app-card-buy-item>
@@ -40,7 +40,6 @@
   <!-- <button (click)="resetPurchasedItems()">rest</button> -->
 
   <ng-template #noItems>
-    <p class="text-default">Nenhum item foi adicionado ainda 🛒.</p>
+    <p class="text-default">Nenhum item adicionado 🛒.</p>
   </ng-template>
 </div>
-
