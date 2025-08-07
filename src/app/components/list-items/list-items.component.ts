@@ -286,6 +286,13 @@ export class ListItemsComponent {
     }, 1000)
   }
 
+   notifyRevertAllItems(): void {
+    this.addTextNotify = 'Removido todos desta categoria! ✅'
+    setTimeout(() => {
+      this.addTextNotify = ''
+    }, 2000)
+  }
+
   notifyAddBuyItem(): void {
     this.addTextNotify = 'adcionado No carrinho! ✅'
     setTimeout(() => {
