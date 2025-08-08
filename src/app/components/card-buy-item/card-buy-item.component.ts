@@ -15,7 +15,6 @@ export class CardBuyItemComponent {
   @Input() quantity!: number;
   @Input() total!: number | string;
   
-
   @Output() remove = new EventEmitter<void>()
 
   onRemove(): void {

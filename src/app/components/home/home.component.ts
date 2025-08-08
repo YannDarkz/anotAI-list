@@ -6,7 +6,6 @@ import { Router } from '@angular/router';
 import { UserDataService } from '../../services/user-data/user-data.service'; 
 import { CommonModule } from '@angular/common';
 
-
 @Component({
     selector: 'app-home',
     standalone: true,

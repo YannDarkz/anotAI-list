@@ -63,7 +63,6 @@ export class ListItemsComponent {
 
     this.userDataService.getUserData().subscribe(data => {
       this.userData = data;
-      // console.log("UserData", data);
 
       this.userId = data?.userId
 
@@ -107,14 +106,6 @@ export class ListItemsComponent {
     });
 
     Promise.all(loadPromises).then(() => {
-      // console.log('Before sorting:', this.categoriesWithItems);
-      // this.categoriesWithItems = Object.keys(this.categoriesWithItems)
-      // .sort((a, b) => categoryOrder.indexOf(a) - categoryOrder.indexOf(b))
-      // .reduce((sortedCategories, key) => {
-      //   sortedCategories[key as keyof Icategory] = this.categoriesWithItems[key as keyof Icategory];
-      //   return sortedCategories;
-      // }, {} as Icategory);
-
       this.calculateTotalPrice();
     });
   }
@@ -247,8 +238,6 @@ export class ListItemsComponent {
 
     requestAnimationFrame(animateScroll);
   }
-
-
 
   showError(message: string): void {
     this.messageError = message;
