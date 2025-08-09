@@ -22,6 +22,7 @@ export class BuyItemComponent {
   userId: string | undefined = undefined;
   @Output() itemUpdated = new EventEmitter<void>()
   @Output() itemsUpdated = new EventEmitter<void>()
+  // @Output() itemRemoved = new EventEmitter<void>();
 
   constructor(private shoppingService: ShoppingListService, private userData: UserDataService, private itemUpdateService: ItemUpdateService) { }
 
@@ -38,7 +39,6 @@ export class BuyItemComponent {
 
   buyPrice: number = 0
 
-  @Output() itemRemoved = new EventEmitter<void>();
   // @Output() removeItemBuy = new EventEmitter<void>()
 
   async ngOnInit(): Promise<void> {
@@ -146,7 +146,6 @@ export class BuyItemComponent {
       this.categoriesWithItems[category] = []; // Limpa a lista local
       this.calculateTotalPrice();
       this.itemsUpdated.emit();
-      // console.log(`Todos os itens da categoria "${category}" foram movidos para a lista de compras.`);
     })
     .catch(error => {
       console.error('Erro ao mover os itens:', error);
