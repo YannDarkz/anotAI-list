@@ -89,6 +89,10 @@ export class ListItemsComponent {
     this.buyItemComponent.itemUpdated.subscribe(() => {
       this.loadItems();
     });
+
+    this.buyItemComponent.itemsUpdated.subscribe(() => {
+      this.loadItems();
+    });
   }
 
   loadItems(): void {
@@ -279,7 +283,7 @@ export class ListItemsComponent {
     this.addTextNotify = 'Removido todos desta categoria! ✅'
     setTimeout(() => {
       this.addTextNotify = ''
-    }, 2000)
+    }, 3000)
   }
 
   notifyAddBuyItem(): void {
