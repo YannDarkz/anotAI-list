@@ -129,7 +129,6 @@ export class AddItemsComponent {
       this.currentItemCategory = null;
       this.itemUpdated.emit();
 
-      // console.log('Operação concluída com sucesso.');
     } catch (error) {
       console.error('Erro ao adicionar/editar item:', error);
     }
@@ -167,7 +166,7 @@ export class AddItemsComponent {
 
   decrement(): void {
     const currentQuantity = this.addItemForm.get('quantity')?.value || 0;
-    if (currentQuantity > 1) { // Para garantir que a quantidade não fique abaixo de 1
+    if (currentQuantity > 1) {
       this.addItemForm.get('quantity')?.setValue(currentQuantity - 1);
     }
   }

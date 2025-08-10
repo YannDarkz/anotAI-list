@@ -143,7 +143,7 @@ export class BuyItemComponent {
 
   Promise.all(promises)
     .then(() => {
-      this.categoriesWithItems[category] = []; // Limpa a lista local
+      this.categoriesWithItems[category] = [];
       this.calculateTotalPrice();
       this.itemsUpdated.emit();
     })
