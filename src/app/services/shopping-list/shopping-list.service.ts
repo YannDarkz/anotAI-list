@@ -1,15 +1,9 @@
 
 import { Injectable, NgZone, inject } from '@angular/core';
 import { ɵAngularFireSchedulers, ɵzoneWrap } from '@angular/fire';
-import { getDoc as getDocOriginal } from 'firebase/firestore';
 import { Iproduct } from '../../interfaces/item-list';
 import { Firestore, doc, collection, query, where, setDoc, updateDoc, getDoc, getDocs, arrayUnion, arrayRemove } from '@angular/fire/firestore';
 import { Icategory } from '../firebase/user-fire.service';
-
-
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { Observable, throwError } from 'rxjs';
-import { catchError } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -19,8 +13,6 @@ export class ShoppingListService {
   private firestore = inject(Firestore);
   private ngZone = inject(NgZone);
    private schedulers = inject(ɵAngularFireSchedulers);
-  //  private  getDoc = inject(getDoc);
-
 
   async addItem(userId: string, category: string, item: Iproduct): Promise<void> {
 
@@ -31,7 +23,6 @@ export class ShoppingListService {
       const userData = userDoc.data();
       const updatedShoppingLists = userData['shoppingLists']?.map((list: any) => {
         if (list.category === category) {
-          // console.log('dados run');
 
           return { ...list, products: [...list.products, item] };
         }
