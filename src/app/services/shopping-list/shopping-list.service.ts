@@ -124,8 +124,8 @@ export class ShoppingListService {
 
     if (userDoc.exists()) {
       const userData = userDoc.data();
-      const categoryItems = userData['shoppingList']?.[category]; // Acessa os itens pela chave da categoria
-      return categoryItems || {}; // Retorna os itens ou um array vazio se a categoria não existir
+      const categoryItems = userData['shoppingList']?.[category]; 
+      return categoryItems || {}; 
     } else {
       throw new Error('Usuário não encontrado.');
     }
