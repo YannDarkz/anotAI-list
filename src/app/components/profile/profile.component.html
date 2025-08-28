@@ -1,5 +1,4 @@
 <div class="user-profile" *ngIf="userData">
-    <!-- <img src={{userData.picture}} alt="foto-perfil"> -->
     <img *ngIf="userData?.picture" [src]="userData.picture" alt="User Profile">
     <h4><strong>{{userData.name}}</strong></h4>
   </div>
